@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using TMPro;
+﻿using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -8,20 +7,20 @@ using static GameConstants;
 public class PlayerNetwork : NetworkBehaviour
 {
     private NetworkTransform _transform;
-    //private TextMeshPro _playerLabelText;
-    //private TextMeshProUGUI _scoreText;
+    private TextMeshPro _playerLabelText;
+    private TextMeshProUGUI _scoreText;
     //private SpriteRenderer _challengeImage;
 
 
-    //private NetworkVariable<int> _score = new();
-    //private NetworkVariable<bool> _isInChallenge = new();
+    private NetworkVariable<int> _score = new();
+    private NetworkVariable<bool> _isInChallenge = new();
 
-    //private NetworkVariable<int> _lives = new(StartingLives);
-    
+    private NetworkVariable<int> _lives = new(StartingLives);
+
 
     private void Awake()
     {
-        //_scoreText = GameObject.Find("ScoreUI").GetComponentInChildren<TextMeshProUGUI>();
+        _scoreText = GameObject.Find("ScoreUI").GetComponentInChildren<TextMeshProUGUI>();
         //_challengeImage = GetComponentInChildren<SpriteRenderer>();
     }
 
@@ -33,12 +32,12 @@ public class PlayerNetwork : NetworkBehaviour
         player.name = $"Player {NetworkManager.LocalClientId}";
 
 
-        /*_score.OnValueChanged += TreatCollectibleCollision;
-        _isInChallenge.OnValueChanged += TreatPlayerCollision;
-        _lives.OnValueChanged += TreatLivesChanged;*/
+        //_score.OnValueChanged += TreatCollectibleCollision;
+        //_isInChallenge.OnValueChanged += TreatPlayerCollision;
+        //_lives.OnValueChanged += TreatLivesChanged;
 
 
-        /*_playerLabelText = player.GetComponentInChildren<TextMeshPro>();
+        _playerLabelText = player.GetComponentInChildren<TextMeshPro>();
         UpdatePlayerLabel(player);
         _playerLabelText.color = Color.green;
 
@@ -49,7 +48,7 @@ public class PlayerNetwork : NetworkBehaviour
 
         if (IsServer) return;
         print($"Applying starting score of 0 on owner (ownerclientid) {OwnerClientId}");
-        _scoreText.text = "Score: 0";*/
+        _scoreText.text = "Score: 0";
     }
 
     public override void OnNetworkDespawn()
@@ -80,7 +79,7 @@ public class PlayerNetwork : NetworkBehaviour
 
         var movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-        if (movement.magnitude > 0/* && !_isInChallenge.Value*/)
+        if (movement.magnitude > 0 /* && !_isInChallenge.Value*/)
         {
             SendClientInputServerRpc(movement);
         }
@@ -217,12 +216,12 @@ public class PlayerNetwork : NetworkBehaviour
         print($"Incrementing player {winnerId} life");
         winner.gameObject.GetComponent<PlayerNetwork>()._lives.Value += 1;
     }
-
+*/
     private void UpdatePlayerLabel(GameObject player)
     {
-        // print($"Updating player {NetworkObjectId} label");
-        /*_playerLabelText.text =
-            $"Player: {NetworkObjectId} \nLives: {_lives.Value} \nLayer: {player.layer}";#1#
-        _playerLabelText.text =$"Player: {NetworkObjectId} \nLives: {_lives.Value}";
-    }*/
+        print($"Updating player {NetworkObjectId} label");
+        _playerLabelText.text =
+            $"Player: {NetworkObjectId} \nLives: {_lives.Value} \nLayer: {player.layer}";
+        _playerLabelText.text = $"Player: {NetworkObjectId} \nLives: {_lives.Value}";
+    }
 }
