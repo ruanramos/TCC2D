@@ -11,8 +11,8 @@ public static class GameConstants
     // Game space
     public const int MinHorizontal = -45;
     public const int MaxHorizontal = 45;
-    public const int MinVertical = -30;
-    public const int MaxVertical = 60;
+    public const int MinVertical = -45;
+    public const int MaxVertical = 45;
 
     // Collectibles
     public const int CollectibleValue = 1;

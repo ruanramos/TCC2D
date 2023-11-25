@@ -15,8 +15,8 @@ public class CollectibleBehaviour : NetworkBehaviour
         gameObject.GetComponent<NetworkObject>().Despawn(destroy: false);
         transform.position = new Vector3(
             Random.Range(MinHorizontal, MaxHorizontal),
-            0,
-            Random.Range(MinVertical, MaxVertical));
+            Random.Range(MinVertical, MaxVertical),
+            0);
         gameObject.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
     }
     

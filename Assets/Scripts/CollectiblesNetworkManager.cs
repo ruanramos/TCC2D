@@ -26,8 +26,8 @@ public class CollectiblesNetworkManager : NetworkBehaviour
             var collectibleTransform = Instantiate(collectiblePrefab,
                 new Vector3(
                     Random.Range(MinHorizontal, MaxHorizontal),
-                    0,
-                    Random.Range(MinVertical, MaxVertical)),
+                    Random.Range(MinVertical, MaxVertical),
+                    0),
                 collectiblePrefab.transform.rotation);
             collectibleTransform.GetComponent<NetworkObject>().Spawn(true);
         }
