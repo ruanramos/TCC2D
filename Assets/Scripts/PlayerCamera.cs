@@ -1,14 +1,12 @@
 using Unity.Netcode;
 using UnityEngine;
-using static GameConstants;
 
 public class PlayerCamera : NetworkBehaviour
 {
     public override void OnNetworkSpawn()
     {
         if (!IsOwner) return;
-        var mainCamera = GameObject.Find("MainCamera");
+        var mainCamera = GameObject.Find("Main Camera");
         mainCamera.transform.parent = transform;
-        mainCamera.transform.localPosition = new Vector3(transform.position.x, transform.position.y, CameraHeight);
     }
 }
