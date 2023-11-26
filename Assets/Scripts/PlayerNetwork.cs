@@ -71,7 +71,8 @@ public class PlayerNetwork : NetworkBehaviour
             inputValue.Normalize();
         }
 
-        transform.position += new Vector3(inputValue.x, inputValue.y) * (Time.deltaTime * BaseMovespeed * _speedMultiplier);
+        transform.position += new Vector3(inputValue.x, inputValue.y) *
+                              (Time.deltaTime * BaseMovespeed * _speedMultiplier);
     }
 
     private void Update()
@@ -141,12 +142,6 @@ public class PlayerNetwork : NetworkBehaviour
         gameObject.GetComponent<CircleCollider2D>().enabled = true;
         renderer.color = color;
         _speedMultiplier = 1;
-    }
-
-    private IEnumerator PostChallengeInvincibility()
-    {
-        yield return new WaitForSeconds(PostChallengeInvincibilityTimeInSeconds);
-        gameObject.GetComponent<CircleCollider2D>().enabled = true;
     }
 
     private void TreatLivesChanged(int previousLives, int currentLives)
