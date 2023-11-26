@@ -168,6 +168,10 @@ public class PlayerNetwork : NetworkBehaviour
             print(
                 $"Player {NetworkObjectId} won a challenge and earned 1 life." +
                 $" It had {previousLives} Now it has {currentLives}");
+            if (IsServer)
+            {
+                _score.Value += ChallengeValue;
+            }
         }
 
         UpdatePlayerLabel(gameObject);
