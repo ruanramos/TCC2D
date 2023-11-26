@@ -1,6 +1,7 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
 using static GameConstants;
+using static GameConstants.Layers;
 
 public class GameManager : NetworkBehaviour
 {
@@ -56,11 +57,11 @@ public class GameManager : NetworkBehaviour
 
     private void Start()
     {
-        print($"Will remove collisions from layers {PlayerLayerNumber} and {InChallengePlayerLayerNumber}");
-        Physics.IgnoreLayerCollision(PlayerLayerNumber, InChallengePlayerLayerNumber);
-        print($"Removed collisions from layers {PlayerLayerNumber} and {InChallengePlayerLayerNumber}");
+        print($"Will remove collisions from layers {Player} and {InChallengePlayer}");
+        Physics.IgnoreLayerCollision((int)Player, (int)InChallengePlayer);
+        print($"Removed collisions from layers {Player} and {InChallengePlayer}");
         print(
-            $"IS COLLISION SUPPOSED TO HAPPEN? {!Physics.GetIgnoreLayerCollision(InChallengePlayerLayerNumber, PlayerLayerNumber)}");
+            $"IS COLLISION SUPPOSED TO HAPPEN? {!Physics.GetIgnoreLayerCollision((int)InChallengePlayer, (int)Player)}");
     }
 
 

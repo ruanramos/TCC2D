@@ -1,9 +1,11 @@
 ﻿using System.Collections;
+using DefaultNamespace;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using static GameConstants;
+using static GameConstants.Layers;
 
 public class PlayerNetwork : NetworkBehaviour
 {
@@ -11,6 +13,7 @@ public class PlayerNetwork : NetworkBehaviour
     private TextMeshPro _playerLabelText;
     private TextMeshProUGUI _scoreText;
     private SpriteRenderer _challengeImage;
+    private float _speedMultiplier = 1;
 
 
     private NetworkVariable<int> _score = new();
@@ -21,7 +24,7 @@ public class PlayerNetwork : NetworkBehaviour
     private void Awake()
     {
         _scoreText = GameObject.Find("ScoreUI").GetComponentInChildren<TextMeshProUGUI>();
-        //_challengeImage = GetComponentInChildren<SpriteRenderer>();
+        _challengeImage = Utilities.FindChildGameObjectByName(transform, "Swords").GetComponent<SpriteRenderer>();
     }
 
     public override void OnNetworkSpawn()
@@ -68,7 +71,7 @@ public class PlayerNetwork : NetworkBehaviour
             inputValue.Normalize();
         }
 
-        transform.position += new Vector3(inputValue.x, inputValue.y) * (Time.deltaTime * BaseMovespeed);
+        transform.position += new Vector3(inputValue.x, inputValue.y) * (Time.deltaTime * BaseMovespeed * _speedMultiplier);
     }
 
     private void Update()
@@ -103,7 +106,7 @@ public class PlayerNetwork : NetworkBehaviour
 
                 var playerGameObject = gameObject;
 
-                playerGameObject.layer = InChallengePlayerLayerNumber;
+                playerGameObject.layer = (int)InChallengePlayer;
 
                 break;
         }
@@ -121,6 +124,29 @@ public class PlayerNetwork : NetworkBehaviour
     private void TreatPlayerCollision(bool wasInChallenge, bool isInChallenge)
     {
         UpdatePlayerLabel(gameObject);
+        if (!isInChallenge) return;
+        // Entered a challenge, collider and color behavior
+        gameObject.GetComponent<CircleCollider2D>().enabled = false;
+        StartCoroutine(MakePlayerTransparentWhileInChallenge());
+    }
+
+    private IEnumerator MakePlayerTransparentWhileInChallenge()
+    {
+        var renderer = GetComponentInChildren<SpriteRenderer>();
+        var color = renderer.color;
+        renderer.color = new Color(color.r, color.g, color.b, 0.4f);
+        yield return new WaitWhile(() => _isInChallenge.Value);
+        _speedMultiplier = 2;
+        yield return new WaitForSeconds(PostChallengeInvincibilityTimeInSeconds);
+        gameObject.GetComponent<CircleCollider2D>().enabled = true;
+        renderer.color = color;
+        _speedMultiplier = 1;
+    }
+
+    private IEnumerator PostChallengeInvincibility()
+    {
+        yield return new WaitForSeconds(PostChallengeInvincibilityTimeInSeconds);
+        gameObject.GetComponent<CircleCollider2D>().enabled = true;
     }
 
     private void TreatLivesChanged(int previousLives, int currentLives)
@@ -177,8 +203,8 @@ public class PlayerNetwork : NetworkBehaviour
 
         print($"Player {player1Id} was in layer {player1.layer} before challenge started");
         print($"Player {player2Id} was in layer {player2.layer} before challenge started");
-        player1.layer = InChallengePlayerLayerNumber;
-        player2.layer = InChallengePlayerLayerNumber;
+        player1.layer = (int)InChallengePlayer;
+        player2.layer = (int)InChallengePlayer;
         print($"Player {player1Id} is now in layer {player1.layer} after challenge started");
         print($"Player {player2Id} is now in layer {player2.layer} after challenge started");
         UpdatePlayerLabel(player1);
@@ -187,8 +213,8 @@ public class PlayerNetwork : NetworkBehaviour
 
         print($"Player {player1Id} was in layer {player1.layer} before challenge ends");
         print($"Player {player2Id} was in layer {player2.layer} before challenge ends");
-        player1.layer = PlayerLayerNumber;
-        player2.layer = PlayerLayerNumber;
+        player1.layer = (int)Player;
+        player2.layer = (int)Player;
         print($"Player {player1Id} is now in layer {player1.layer} after challenge ends");
         print($"Player {player2Id} is now in layer {player2.layer} after challenge ends");
         UpdatePlayerLabel(player1);

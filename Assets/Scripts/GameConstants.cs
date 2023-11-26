@@ -1,11 +1,9 @@
-using UnityEngine;
-
 public static class GameConstants
 {
     // Camera
     public const float CameraHeight = -10;
     public const float BaseObserverCameraMovespeed = 50f;
-    
+
 
     // Game space
     public const int MinHorizontal = -45;
@@ -19,11 +17,15 @@ public static class GameConstants
 
     // Challenges
     public const int ChallengeValue = 50;
+    public const float PostChallengeInvincibilityTimeInSeconds = 3f;
 
 
     // Layers
-    public const int PlayerLayerNumber = 3;
-    public const int InChallengePlayerLayerNumber = 6;
+    public enum Layers
+    {
+        Player = 3,
+        InChallengePlayer = 6
+    }
 
     // Players
     public const int StartingLives = 3;

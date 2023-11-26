@@ -6,7 +6,7 @@ namespace Console
 {
     public class ConsoleCommands
     {
-        /*[Command("connectedPlayers", "Prints the list of connected players")]
+        [Command("connectedPlayers", "Prints the list of connected players")]
         public static void ConnectedPlayers()
         {
             foreach (var player in GameManager.ConnectedPlayers)
@@ -28,7 +28,7 @@ namespace Console
                     break;
                 }
             }
-        }*/
+        }
         
         [Command("score", "")]
         public static void TestCommand()
