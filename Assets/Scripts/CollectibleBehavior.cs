@@ -4,8 +4,9 @@ using static GameConstants;
 
 public class CollectibleBehaviour : NetworkBehaviour
 {
-    public void OnCollisionEnter(Collision other)
+    public void OnCollisionEnter2D(Collision2D other)
     {
+        print("COLLECTIBLE COLLIDED WITH " + other.gameObject.tag);
         if (!other.gameObject.tag.Equals("Player")) return;
         MoveCollectible();
     }
@@ -19,5 +20,4 @@ public class CollectibleBehaviour : NetworkBehaviour
             0);
         gameObject.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
     }
-    
 }

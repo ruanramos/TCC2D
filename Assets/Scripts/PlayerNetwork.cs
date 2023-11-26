@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Collections;
+using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -9,12 +10,11 @@ public class PlayerNetwork : NetworkBehaviour
     private NetworkTransform _transform;
     private TextMeshPro _playerLabelText;
     private TextMeshProUGUI _scoreText;
-    //private SpriteRenderer _challengeImage;
+    private SpriteRenderer _challengeImage;
 
 
     private NetworkVariable<int> _score = new();
     private NetworkVariable<bool> _isInChallenge = new();
-
     private NetworkVariable<int> _lives = new(StartingLives);
 
 
@@ -32,9 +32,9 @@ public class PlayerNetwork : NetworkBehaviour
         player.name = $"Player {NetworkManager.LocalClientId}";
 
 
-        //_score.OnValueChanged += TreatCollectibleCollision;
-        //_isInChallenge.OnValueChanged += TreatPlayerCollision;
-        //_lives.OnValueChanged += TreatLivesChanged;
+        _score.OnValueChanged += TreatCollectibleCollision;
+        _isInChallenge.OnValueChanged += TreatPlayerCollision;
+        _lives.OnValueChanged += TreatLivesChanged;
 
 
         _playerLabelText = player.GetComponentInChildren<TextMeshPro>();
@@ -55,9 +55,9 @@ public class PlayerNetwork : NetworkBehaviour
     {
         base.OnNetworkDespawn();
 
-        /*_score.OnValueChanged -= TreatCollectibleCollision;
+        _score.OnValueChanged -= TreatCollectibleCollision;
         _isInChallenge.OnValueChanged -= TreatPlayerCollision;
-        _lives.OnValueChanged -= TreatLivesChanged;*/
+        _lives.OnValueChanged -= TreatLivesChanged;
     }
 
     [ServerRpc]
@@ -79,13 +79,13 @@ public class PlayerNetwork : NetworkBehaviour
 
         var movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-        if (movement.magnitude > 0 /* && !_isInChallenge.Value*/)
+        if (movement.magnitude > 0 && !_isInChallenge.Value)
         {
             SendClientInputServerRpc(movement);
         }
     }
 
-    /*private void OnCollisionEnter(Collision other)
+    private void OnCollisionEnter2D(Collision2D other)
     {
         switch (other.gameObject.tag)
         {
@@ -107,9 +107,9 @@ public class PlayerNetwork : NetworkBehaviour
 
                 break;
         }
-    }*/
+    }
 
-    /*private void TreatCollectibleCollision(int previousScore, int currentScore)
+    private void TreatCollectibleCollision(int previousScore, int currentScore)
     {
         print($"Player {NetworkObjectId} had a score of {previousScore}" +
               $" and now has a score of {currentScore}");
@@ -216,7 +216,7 @@ public class PlayerNetwork : NetworkBehaviour
         print($"Incrementing player {winnerId} life");
         winner.gameObject.GetComponent<PlayerNetwork>()._lives.Value += 1;
     }
-*/
+
     private void UpdatePlayerLabel(GameObject player)
     {
         print($"Updating player {NetworkObjectId} label");

@@ -6,7 +6,8 @@ public class PlayerCamera : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         if (!IsOwner) return;
-        var mainCamera = GameObject.Find("Main Camera");
+        if (Camera.main == null) return;
+        var mainCamera = Camera.main.gameObject;
         mainCamera.transform.parent = transform;
     }
 }

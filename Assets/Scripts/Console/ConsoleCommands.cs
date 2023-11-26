@@ -1,4 +1,5 @@
 ﻿using QFSW.QC;
+using TMPro;
 using UnityEngine;
 
 namespace Console
@@ -28,6 +29,14 @@ namespace Console
                 }
             }
         }*/
+        
+        [Command("score", "")]
+        public static void TestCommand()
+        {
+            var _scoreText = GameObject.Find("ScoreUI").GetComponentInChildren<TextMeshProUGUI>();
+            Debug.Log($"{_scoreText.text}");
+            Debug.Log($"{_scoreText.enabled}");
+        }
         
         
     }

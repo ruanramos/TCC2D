@@ -4,7 +4,6 @@ public static class GameConstants
 {
     // Camera
     public const float CameraHeight = -10;
-    public const int PlayerCameraFieldOfView = 75;
     public const float BaseObserverCameraMovespeed = 50f;
     
 
