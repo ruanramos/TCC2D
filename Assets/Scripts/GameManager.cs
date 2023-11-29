@@ -6,13 +6,11 @@ using static GameConstants.Layers;
 public class GameManager : NetworkBehaviour
 {
     public static NetworkList<PlayerData> ConnectedPlayers;
-    private bool _appliedColors;
     private GameObject _mainCamera;
 
     private void Awake()
     {
         ConnectedPlayers = new NetworkList<PlayerData>();
-        _appliedColors = false;
 
         if (Camera.main != null) _mainCamera = Camera.main.gameObject;
     }
@@ -20,17 +18,16 @@ public class GameManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-        _appliedColors = false;
+        //NetworkManager.Singleton.OnClientConnectedCallback += CreateClientData;
     }
 
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
-        NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+        //NetworkManager.Singleton.OnClientConnectedCallback -= CreateClientData;
     }
 
-    private void OnClientConnected(ulong clientId)
+    private void CreateClientData(ulong clientId)
     {
         if (!IsServer) return;
         var playerRandomColor = Random.ColorHSV();
@@ -38,7 +35,6 @@ public class GameManager : NetworkBehaviour
         var newPlayerData = new PlayerData(clientId, playerRandomColor);
         ConnectedPlayers.Add(newPlayerData);
         print("Added new player to connected players list");
-        _appliedColors = false;
     }
 
     private void Update()
@@ -49,23 +45,15 @@ public class GameManager : NetworkBehaviour
                 new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0) *
                 (Time.deltaTime * BaseObserverCameraMovespeed);
         }
-
-        if (_appliedColors) return;
-        ApplyClientColors();
-        _appliedColors = true;
     }
 
     private void Start()
     {
-        print($"Will remove collisions from layers {Player} and {InChallengePlayer}");
         Physics.IgnoreLayerCollision((int)Player, (int)InChallengePlayer);
         print($"Removed collisions from layers {Player} and {InChallengePlayer}");
-        print(
-            $"IS COLLISION SUPPOSED TO HAPPEN? {!Physics.GetIgnoreLayerCollision((int)InChallengePlayer, (int)Player)}");
     }
 
-
-    private static void ApplyClientColors()
+    public static void ApplyClientColors()
     {
         foreach (var connectedPlayer in ConnectedPlayers)
         {

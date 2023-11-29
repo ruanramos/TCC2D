@@ -19,6 +19,7 @@ public class PlayerNetwork : NetworkBehaviour
     private NetworkVariable<int> _score = new();
     private NetworkVariable<bool> _isInChallenge = new();
     private NetworkVariable<int> _lives = new(StartingLives);
+    private NetworkVariable<Color> _color = new();
 
 
     private void Awake()
@@ -38,7 +39,7 @@ public class PlayerNetwork : NetworkBehaviour
         _score.OnValueChanged += TreatCollectibleCollision;
         _isInChallenge.OnValueChanged += TreatPlayerCollision;
         _lives.OnValueChanged += TreatLivesChanged;
-
+        _color.OnValueChanged += TreatColorChanged;
 
         _playerLabelText = player.GetComponentInChildren<TextMeshPro>();
         UpdatePlayerLabel(player);
@@ -49,9 +50,25 @@ public class PlayerNetwork : NetworkBehaviour
             _playerLabelText.color = Color.red;
         }
 
-        if (IsServer) return;
+        if (IsOwner)
+        {
+            SetUpColorServerRpc();
+        }
+
+        gameObject.GetComponentInChildren<SpriteRenderer>().color = _color.Value;
+
         print($"Applying starting score of 0 on owner (ownerclientid) {OwnerClientId}");
         _scoreText.text = "Score: 0";
+    }
+
+    [ServerRpc]
+    private void SetUpColorServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        if (IsServer)
+        {
+            _color.Value = Random.ColorHSV();
+            gameObject.GetComponentInChildren<SpriteRenderer>().color = _color.Value;
+        }
     }
 
     public override void OnNetworkDespawn()
@@ -61,6 +78,7 @@ public class PlayerNetwork : NetworkBehaviour
         _score.OnValueChanged -= TreatCollectibleCollision;
         _isInChallenge.OnValueChanged -= TreatPlayerCollision;
         _lives.OnValueChanged -= TreatLivesChanged;
+        _color.OnValueChanged -= TreatColorChanged;
     }
 
     [ServerRpc]
@@ -110,6 +128,14 @@ public class PlayerNetwork : NetworkBehaviour
                 playerGameObject.layer = (int)InChallengePlayer;
 
                 break;
+        }
+    }
+
+    private void TreatColorChanged(Color previousColor, Color currentColor)
+    {
+        if (!IsServer)
+        {
+            gameObject.GetComponentInChildren<SpriteRenderer>().color = currentColor;
         }
     }
 
