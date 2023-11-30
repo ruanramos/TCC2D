@@ -160,9 +160,10 @@ public class PlayerNetwork : NetworkBehaviour
             return;
         }
 
-        // Entered a challenge, collider and color behavior
+        // Entered a challenge
         if (IsOwner)
         {
+            // Create challenge frame
             var challengeCanvas = GameManager.InstantiateChallengeCanvas();
             challengeCanvas.GetComponentInChildren<TextMeshProUGUI>().text =
                 $"Player {OwnerClientId} X Player {_challengeOpponent.Value}";
@@ -289,6 +290,6 @@ public class PlayerNetwork : NetworkBehaviour
     [ServerRpc]
     public void RemoveLivesServerRpc(int n)
     {
-        _lives.Value += n;
+        _lives.Value -= n;
     }
 }
