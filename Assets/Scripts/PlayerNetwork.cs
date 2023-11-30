@@ -35,24 +35,23 @@ public class PlayerNetwork : NetworkBehaviour
         // Renaming gameobject for clarity
         player.name = $"Player {NetworkManager.LocalClientId}";
 
-
         _score.OnValueChanged += TreatCollectibleCollision;
         _isInChallenge.OnValueChanged += TreatPlayerCollision;
         _lives.OnValueChanged += TreatLivesChanged;
         _color.OnValueChanged += TreatColorChanged;
 
         _playerLabelText = player.GetComponentInChildren<TextMeshPro>();
-        UpdatePlayerLabel(player);
+        UpdatePlayerLabel();
         _playerLabelText.color = Color.green;
 
-        if (!IsOwner)
+        switch (IsOwner)
         {
-            _playerLabelText.color = Color.red;
-        }
-
-        if (IsOwner)
-        {
-            SetUpColorServerRpc();
+            case false:
+                _playerLabelText.color = Color.red;
+                break;
+            case true:
+                SetUpColorServerRpc();
+                break;
         }
 
         gameObject.GetComponentInChildren<SpriteRenderer>().color = _color.Value;
@@ -64,11 +63,9 @@ public class PlayerNetwork : NetworkBehaviour
     [ServerRpc]
     private void SetUpColorServerRpc(ServerRpcParams serverRpcParams = default)
     {
-        if (IsServer)
-        {
-            _color.Value = Random.ColorHSV();
-            gameObject.GetComponentInChildren<SpriteRenderer>().color = _color.Value;
-        }
+        if (!IsServer) return;
+        _color.Value = Random.ColorHSV();
+        gameObject.GetComponentInChildren<SpriteRenderer>().color = _color.Value;
     }
 
     public override void OnNetworkDespawn()
@@ -150,7 +147,6 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void TreatPlayerCollision(bool wasInChallenge, bool isInChallenge)
     {
-        UpdatePlayerLabel(gameObject);
         if (!isInChallenge) return;
         // Entered a challenge, collider and color behavior
         gameObject.GetComponent<CircleCollider2D>().enabled = false;
@@ -175,7 +171,9 @@ public class PlayerNetwork : NetworkBehaviour
         if (currentLives <= 0)
         {
             // Player is dead after challenge
-            print($"Player {NetworkObjectId} is dead");
+            if (!IsServer) return;
+            print($"Player {NetworkObjectId} died");
+            GameManager.Disconnect();
             return;
         }
 
@@ -200,7 +198,7 @@ public class PlayerNetwork : NetworkBehaviour
             }
         }
 
-        UpdatePlayerLabel(gameObject);
+        UpdatePlayerLabel();
     }
 
     private IEnumerator SimulateChallenge(GameObject player1, GameObject player2)
@@ -226,24 +224,15 @@ public class PlayerNetwork : NetworkBehaviour
         player1Network._isInChallenge.Value = true;
         player2Network._isInChallenge.Value = true;
 
-        print($"Player {player1Id} was in layer {player1.layer} before challenge started");
-        print($"Player {player2Id} was in layer {player2.layer} before challenge started");
-        player1.layer = (int)InChallengePlayer;
-        player2.layer = (int)InChallengePlayer;
-        print($"Player {player1Id} is now in layer {player1.layer} after challenge started");
-        print($"Player {player2Id} is now in layer {player2.layer} after challenge started");
-        UpdatePlayerLabel(player1);
-        UpdatePlayerLabel(player2);
-        yield return new WaitForSeconds(ChallengeSimulationTimeInSeconds);
+        if (IsOwner)
+        {
+            print($"Owner {NetworkObjectId} is instantiating challenge canvas");
+            var challengeCanvas = GameManager.InstantiateChallengeCanvas();
+            challengeCanvas.GetComponentInChildren<TextMeshProUGUI>().text =
+                $"Player {player1Id} vs Player {player2Id}";
+        }
 
-        print($"Player {player1Id} was in layer {player1.layer} before challenge ends");
-        print($"Player {player2Id} was in layer {player2.layer} before challenge ends");
-        player1.layer = (int)Player;
-        player2.layer = (int)Player;
-        print($"Player {player1Id} is now in layer {player1.layer} after challenge ends");
-        print($"Player {player2Id} is now in layer {player2.layer} after challenge ends");
-        UpdatePlayerLabel(player1);
-        UpdatePlayerLabel(player2);
+        yield return new WaitForSeconds(ChallengeSimulationTimeInSeconds);
 
         var winner = Random.Range(0, 2) == 0
             ? player1
@@ -255,6 +244,12 @@ public class PlayerNetwork : NetworkBehaviour
         player1Network._isInChallenge.Value = false;
         player2Network._isInChallenge.Value = false;
 
+        if (IsOwner)
+        {
+            print($"Owner {NetworkObjectId} is destroying challenge canvas");
+            GameManager.DestroyChallengeCanvas();
+        }
+
         print(
             $"Finishing challenge simulation coroutine between players {player1Id}" +
             $" and {player2Id}. Player {winner} wins");
@@ -264,15 +259,31 @@ public class PlayerNetwork : NetworkBehaviour
         var winnerId = winner.GetComponent<NetworkBehaviour>().NetworkObjectId;
         print($"Removing player {loserId} life");
         loser.gameObject.GetComponent<PlayerNetwork>()._lives.Value -= 1;
-        print($"Incrementing player {winnerId} life");
-        winner.gameObject.GetComponent<PlayerNetwork>()._lives.Value += 1;
+        if (winner.gameObject.GetComponent<PlayerNetwork>()._lives.Value < MaxLives)
+        {
+            print($"Incrementing player {winnerId} life");
+            winner.gameObject.GetComponent<PlayerNetwork>()._lives.Value += 1;
+            yield break;
+        }
+
+        print($"Could not increment player {winnerId} lives because it is already at max lives");
     }
 
-    private void UpdatePlayerLabel(GameObject player)
+    private void UpdatePlayerLabel()
     {
-        print($"Updating player {NetworkObjectId} label");
-        _playerLabelText.text =
-            $"Player: {NetworkObjectId} \nLives: {_lives.Value} \nLayer: {player.layer}";
-        _playerLabelText.text = $"Player: {NetworkObjectId} \nLives: {_lives.Value}";
+        print($"Updating player {OwnerClientId} label");
+        _playerLabelText.text = $"Player: {OwnerClientId} \nLives: {_lives.Value}";
+    }
+
+    [ServerRpc]
+    public void AddLivesServerRpc(int n)
+    {
+        _lives.Value += n;
+    }
+    
+    [ServerRpc]
+    public void RemoveLivesServerRpc(int n)
+    {
+        _lives.Value += n;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static GameConstants;
 using static GameConstants.Layers;
 
@@ -49,5 +50,12 @@ public class GameManager : NetworkBehaviour
     public static void DestroyChallengeCanvas()
     {
         Destroy(GameObject.Find("ChallengeCanvas"));
+    }
+    
+    public static void Disconnect()
+    {
+        if (!NetworkManager.Singleton.IsClient) return;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        NetworkManager.Singleton.Shutdown();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using QFSW.QC;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Console
@@ -29,7 +30,7 @@ namespace Console
                 }
             }
         }
-        
+
         [Command("score", "")]
         public static void TestCommand()
         {
@@ -37,7 +38,39 @@ namespace Console
             Debug.Log($"{_scoreText.text}");
             Debug.Log($"{_scoreText.enabled}");
         }
+
+        [Command("cc", "instantiate challenge canvas")]
+        public static void InstantiateChallengeCanvas()
+        {
+            var challengeCanvas = GameManager.InstantiateChallengeCanvas();
+        }
+
+        [Command("dcc", "destroy challenge canvas")]
+        public static void DestroyChallengeCanvas()
+        {
+            GameManager.DestroyChallengeCanvas();
+        }
         
+        [Command("addLives", "Add life to player")]
+        public static void AddLives(ulong clientId, int n)
+        {
+            foreach (var playerNetwork in Object.FindObjectsOfType<PlayerNetwork>())
+            {
+                if (playerNetwork.OwnerClientId != clientId) continue;
+                playerNetwork.AddLivesServerRpc(n);
+                break;
+            }
+        }
         
+        [Command("removeLives", "Add life to player")]
+        public static void RemoveLives(ulong clientId, int n)
+        {
+            foreach (var playerNetwork in Object.FindObjectsOfType<PlayerNetwork>())
+            {
+                if (playerNetwork.OwnerClientId != clientId) continue;
+                playerNetwork.RemoveLivesServerRpc(n);
+                break;
+            }
+        }
     }
 }

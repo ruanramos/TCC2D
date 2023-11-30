@@ -1,7 +1,6 @@
 ﻿using TMPro;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NetworkManagerUi : MonoBehaviour
@@ -32,24 +31,27 @@ public class NetworkManagerUi : MonoBehaviour
             ActivateDisconnectButton();
         });
 
-        disconnectButton.onClick.AddListener(() =>
-        {
-            if (NetworkManager.Singleton.IsClient)
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-                NetworkManager.Singleton.Shutdown();
-            }
-
-            NetworkManager.Singleton.Shutdown();
-            hostButton.image.color = disconnectButton.image.color;
-            clientButton.image.color = disconnectButton.image.color;
-            serverButton.image.color = disconnectButton.image.color;
-            DeactivateButtons(disconnectButton);
-            ActivateButtons(clientButton, hostButton, serverButton);
-        });
+        disconnectButton.onClick.AddListener(DisconnectUiBehavior);
 
 
         GameObject.Find("PlayerScore").GetComponent<TextMeshProUGUI>().text = "";
+    }
+
+    private void DisconnectUiBehavior()
+    {
+        GameManager.Disconnect();
+
+        NetworkManager.Singleton.Shutdown();
+        ButtonColoring();
+        DeactivateButtons(disconnectButton);
+        ActivateButtons(clientButton, hostButton, serverButton);
+    }
+
+    private void ButtonColoring()
+    {
+        hostButton.image.color = disconnectButton.image.color;
+        clientButton.image.color = disconnectButton.image.color;
+        serverButton.image.color = disconnectButton.image.color;
     }
 
     private void ActivateDisconnectButton()
