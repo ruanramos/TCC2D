@@ -15,18 +15,6 @@ public class GameManager : NetworkBehaviour
         if (Camera.main != null) _mainCamera = Camera.main.gameObject;
     }
 
-    public override void OnNetworkSpawn()
-    {
-        base.OnNetworkSpawn();
-        //NetworkManager.Singleton.OnClientConnectedCallback += CreateClientData;
-    }
-
-    public override void OnNetworkDespawn()
-    {
-        base.OnNetworkDespawn();
-        //NetworkManager.Singleton.OnClientConnectedCallback -= CreateClientData;
-    }
-
     private void CreateClientData(ulong clientId)
     {
         if (!IsServer) return;
@@ -49,21 +37,17 @@ public class GameManager : NetworkBehaviour
 
     private void Start()
     {
-        Physics.IgnoreLayerCollision((int)Player, (int)InChallengePlayer);
-        print($"Removed collisions from layers {Player} and {InChallengePlayer}");
+        //Physics.IgnoreLayerCollision((int)Player, (int)InChallengePlayer);
+        //print($"Removed collisions from layers {Player} and {InChallengePlayer}");
     }
 
-    public static void ApplyClientColors()
+    public static Transform InstantiateChallengeCanvas()
     {
-        foreach (var connectedPlayer in ConnectedPlayers)
-        {
-            Debug.Log($"Applying color {connectedPlayer.ClientColor} to player {connectedPlayer.ClientId}");
-            foreach (var playerNetwork in FindObjectsOfType<PlayerNetwork>())
-            {
-                if (playerNetwork.OwnerClientId != connectedPlayer.ClientId) continue;
-                playerNetwork.GetComponentInChildren<SpriteRenderer>().color = connectedPlayer.ClientColor;
-                break;
-            }
-        }
+        return Instantiate(Resources.Load<GameObject>("Prefabs/ChallengeCanvas")).transform;
+    }
+
+    public static void DestroyChallengeCanvas()
+    {
+        Destroy(GameObject.Find("ChallengeCanvas"));
     }
 }
