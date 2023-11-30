@@ -6,7 +6,6 @@ public class CollectibleBehaviour : NetworkBehaviour
 {
     public void OnCollisionEnter2D(Collision2D other)
     {
-        print("COLLECTIBLE COLLIDED WITH " + other.gameObject.tag);
         if (!other.gameObject.tag.Equals("Player")) return;
         MoveCollectible();
     }
