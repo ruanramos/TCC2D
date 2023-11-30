@@ -49,7 +49,7 @@ public class GameManager : NetworkBehaviour
 
     public static void DestroyChallengeCanvas()
     {
-        Destroy(GameObject.Find("ChallengeCanvas"));
+        Destroy(GameObject.Find("ChallengeCanvas(Clone)"));
     }
     
     public static void Disconnect()

@@ -5,7 +5,6 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using static GameConstants;
-using static GameConstants.Layers;
 
 public class PlayerNetwork : NetworkBehaviour
 {
@@ -18,6 +17,7 @@ public class PlayerNetwork : NetworkBehaviour
 
     private NetworkVariable<int> _score = new();
     private NetworkVariable<bool> _isInChallenge = new();
+    private NetworkVariable<ulong> _challengeOpponent = new();
     private NetworkVariable<int> _lives = new(StartingLives);
     private NetworkVariable<Color> _color = new();
 
@@ -37,6 +37,7 @@ public class PlayerNetwork : NetworkBehaviour
 
         _score.OnValueChanged += TreatCollectibleCollision;
         _isInChallenge.OnValueChanged += TreatPlayerCollision;
+        _challengeOpponent.OnValueChanged += TreatNewOpponent;
         _lives.OnValueChanged += TreatLivesChanged;
         _color.OnValueChanged += TreatColorChanged;
 
@@ -56,6 +57,7 @@ public class PlayerNetwork : NetworkBehaviour
 
         gameObject.GetComponentInChildren<SpriteRenderer>().color = _color.Value;
 
+        if (IsServer) return;
         print($"Applying starting score of 0 on owner (ownerclientid) {OwnerClientId}");
         _scoreText.text = "Score: 0";
     }
@@ -74,6 +76,7 @@ public class PlayerNetwork : NetworkBehaviour
 
         _score.OnValueChanged -= TreatCollectibleCollision;
         _isInChallenge.OnValueChanged -= TreatPlayerCollision;
+        _challengeOpponent.OnValueChanged -= TreatNewOpponent;
         _lives.OnValueChanged -= TreatLivesChanged;
         _color.OnValueChanged -= TreatColorChanged;
     }
@@ -114,16 +117,12 @@ public class PlayerNetwork : NetworkBehaviour
                 _score.Value += CollectibleValue;
                 break;
             case "Player":
+                var opponentId = other.gameObject.GetComponent<NetworkBehaviour>().OwnerClientId;
                 print(
                     $"Collision between players {NetworkObjectId} and " +
-                    $"{other.gameObject.GetComponent<NetworkBehaviour>().NetworkObjectId} happened");
-
+                    $"{opponentId} happened");
+                _challengeOpponent.Value = opponentId;
                 StartCoroutine(SimulateChallenge(gameObject, other.gameObject));
-
-                var playerGameObject = gameObject;
-
-                playerGameObject.layer = (int)InChallengePlayer;
-
                 break;
         }
     }
@@ -134,6 +133,12 @@ public class PlayerNetwork : NetworkBehaviour
         {
             gameObject.GetComponentInChildren<SpriteRenderer>().color = currentColor;
         }
+    }
+
+    private void TreatNewOpponent(ulong previousOpponent, ulong currentOpponent)
+    {
+        if (!IsServer) return;
+        print($"Player {OwnerClientId} is now challenging player {currentOpponent}");
     }
 
     private void TreatCollectibleCollision(int previousScore, int currentScore)
@@ -147,8 +152,22 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void TreatPlayerCollision(bool wasInChallenge, bool isInChallenge)
     {
-        if (!isInChallenge) return;
+        if (!isInChallenge)
+        {
+            // Left a challenge, remove challenge frame
+            if (!IsOwner) return;
+            GameManager.DestroyChallengeCanvas();
+            return;
+        }
+
         // Entered a challenge, collider and color behavior
+        if (IsOwner)
+        {
+            var challengeCanvas = GameManager.InstantiateChallengeCanvas();
+            challengeCanvas.GetComponentInChildren<TextMeshProUGUI>().text =
+                $"Player {OwnerClientId} X Player {_challengeOpponent.Value}";
+        }
+
         gameObject.GetComponent<CircleCollider2D>().enabled = false;
         StartCoroutine(MakePlayerTransparentWhileInChallenge());
     }
@@ -224,14 +243,6 @@ public class PlayerNetwork : NetworkBehaviour
         player1Network._isInChallenge.Value = true;
         player2Network._isInChallenge.Value = true;
 
-        if (IsOwner)
-        {
-            print($"Owner {NetworkObjectId} is instantiating challenge canvas");
-            var challengeCanvas = GameManager.InstantiateChallengeCanvas();
-            challengeCanvas.GetComponentInChildren<TextMeshProUGUI>().text =
-                $"Player {player1Id} vs Player {player2Id}";
-        }
-
         yield return new WaitForSeconds(ChallengeSimulationTimeInSeconds);
 
         var winner = Random.Range(0, 2) == 0
@@ -243,12 +254,6 @@ public class PlayerNetwork : NetworkBehaviour
 
         player1Network._isInChallenge.Value = false;
         player2Network._isInChallenge.Value = false;
-
-        if (IsOwner)
-        {
-            print($"Owner {NetworkObjectId} is destroying challenge canvas");
-            GameManager.DestroyChallengeCanvas();
-        }
 
         print(
             $"Finishing challenge simulation coroutine between players {player1Id}" +
@@ -280,7 +285,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         _lives.Value += n;
     }
-    
+
     [ServerRpc]
     public void RemoveLivesServerRpc(int n)
     {
