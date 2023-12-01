@@ -4,6 +4,7 @@ using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static GameConstants;
 
 public class PlayerNetwork : NetworkBehaviour
@@ -118,10 +119,11 @@ public class PlayerNetwork : NetworkBehaviour
                 break;
             case "Player":
                 var opponentId = other.gameObject.GetComponent<NetworkBehaviour>().OwnerClientId;
-                print(
-                    $"Collision between players {NetworkObjectId} and " +
-                    $"{opponentId} happened");
                 _challengeOpponent.Value = opponentId;
+                print(
+                    $"Collision between players {OwnerClientId} and " +
+                    $"{opponentId} happened");
+
                 StartCoroutine(SimulateChallenge(gameObject, other.gameObject));
                 break;
         }
@@ -143,7 +145,7 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void TreatCollectibleCollision(int previousScore, int currentScore)
     {
-        print($"Player {NetworkObjectId} had a score of {previousScore}" +
+        print($"Player {OwnerClientId} had a score of {previousScore}" +
               $" and now has a score of {currentScore}");
         if (IsServer) return;
         if (!IsOwner) return;
@@ -188,20 +190,26 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void TreatLivesChanged(int previousLives, int currentLives)
     {
-        if (currentLives <= 0)
+        if (currentLives == 0)
         {
             // Player is dead after challenge
-            if (!IsServer) return;
-            print($"Player {NetworkObjectId} died");
-            GameManager.Disconnect();
-            return;
+            if (IsServer)
+            {
+                print($"Player {OwnerClientId} died");
+            }
+
+            if (IsOwner)
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                NetworkManager.Singleton.Shutdown();
+            }
         }
 
         if (currentLives < previousLives)
         {
             // Lost challenge
             print(
-                $"Player {NetworkObjectId} lost a challenge and lost 1 life." +
+                $"Player {OwnerClientId} lost a challenge and lost 1 life." +
                 $" It had {previousLives} Now it has {currentLives}");
         }
 
@@ -210,7 +218,7 @@ public class PlayerNetwork : NetworkBehaviour
         {
             // Won challenge
             print(
-                $"Player {NetworkObjectId} won a challenge and earned 1 life." +
+                $"Player {OwnerClientId} won a challenge and earned 1 life." +
                 $" It had {previousLives} Now it has {currentLives}");
             if (IsServer)
             {
@@ -227,8 +235,8 @@ public class PlayerNetwork : NetworkBehaviour
         var player2NetworkBehaviour = player2.GetComponent<NetworkBehaviour>();
         var player1Network = player1.GetComponent<PlayerNetwork>();
         var player2Network = player2.GetComponent<PlayerNetwork>();
-        var player1Id = player1NetworkBehaviour.NetworkObjectId;
-        var player2Id = player2NetworkBehaviour.NetworkObjectId;
+        var player1Id = player1NetworkBehaviour.OwnerClientId;
+        var player2Id = player2NetworkBehaviour.OwnerClientId;
 
         if (player1Network._isInChallenge.Value || player2Network._isInChallenge.Value)
         {
@@ -256,13 +264,12 @@ public class PlayerNetwork : NetworkBehaviour
         player1Network._isInChallenge.Value = false;
         player2Network._isInChallenge.Value = false;
 
+
+        var loserId = loser.GetComponent<NetworkBehaviour>().OwnerClientId;
+        var winnerId = winner.GetComponent<NetworkBehaviour>().OwnerClientId;
         print(
             $"Finishing challenge simulation coroutine between players {player1Id}" +
-            $" and {player2Id}. Player {winner} wins");
-
-
-        var loserId = loser.GetComponent<NetworkBehaviour>().NetworkObjectId;
-        var winnerId = winner.GetComponent<NetworkBehaviour>().NetworkObjectId;
+            $" and {player2Id}. Player {winnerId} wins");
         print($"Removing player {loserId} life");
         loser.gameObject.GetComponent<PlayerNetwork>()._lives.Value -= 1;
         if (winner.gameObject.GetComponent<PlayerNetwork>()._lives.Value < MaxLives)
