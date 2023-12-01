@@ -33,6 +33,8 @@ public class GameManager : NetworkBehaviour
             _mainCamera.transform.position +=
                 new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0) *
                 (Time.deltaTime * BaseObserverCameraMovespeed);
+
+            _mainCamera.GetComponent<Camera>().orthographicSize -= Input.GetAxis("Mouse ScrollWheel") * 10;
         }
     }
 
