@@ -52,15 +52,13 @@ public class PlayerNetwork : NetworkBehaviour
                 _playerLabelText.color = Color.red;
                 break;
             case true:
+                print($"Applying starting score of 0 on owner (ownerclientid) {OwnerClientId}");
+                _scoreText.text = "Score: 0";
                 SetUpColorServerRpc();
                 break;
         }
 
         gameObject.GetComponentInChildren<SpriteRenderer>().color = _color.Value;
-
-        if (IsServer) return;
-        print($"Applying starting score of 0 on owner (ownerclientid) {OwnerClientId}");
-        _scoreText.text = "Score: 0";
     }
 
     [ServerRpc]
