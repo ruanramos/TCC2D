@@ -164,7 +164,7 @@ public class PlayerNetwork : NetworkBehaviour
         if (IsOwner)
         {
             // Create challenge frame
-            var challengeCanvas = GameManager.InstantiateChallengeCanvas();
+            var challengeCanvas = GameManager.InstantiateChallengeOuterCanvas();
             challengeCanvas.GetComponentInChildren<TextMeshProUGUI>().text =
                 $"Player {OwnerClientId} X Player {_challengeOpponent.Value}";
         }
