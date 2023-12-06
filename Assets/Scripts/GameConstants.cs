@@ -19,9 +19,15 @@ public static class GameConstants
     public const int ChallengeValue = 50;
     public const float PostChallengeInvincibilityTimeInSeconds = 3f;
 
+    public enum ChallengeType
+    {
+        ButtonPress,
+        Simulation
+    }
+
 
     // Layers
-    public enum Layers
+    public enum Layer
     {
         Player = 3,
         InChallengePlayer = 6
