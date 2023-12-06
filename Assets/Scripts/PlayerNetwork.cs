@@ -163,7 +163,7 @@ public class PlayerNetwork : NetworkBehaviour
         // Entered a challenge
         if (IsOwner)
         {
-            // Create challenge frame
+            // Create challenge outer frame
             var challengeCanvas = GameManager.InstantiateChallengeOuterCanvas();
             challengeCanvas.GetComponentInChildren<TextMeshProUGUI>().text =
                 $"Player {OwnerClientId} X Player {_challengeOpponent.Value}";
@@ -175,14 +175,14 @@ public class PlayerNetwork : NetworkBehaviour
 
     private IEnumerator MakePlayerTransparentWhileInChallenge()
     {
-        var renderer = GetComponentInChildren<SpriteRenderer>();
-        var color = renderer.color;
-        renderer.color = new Color(color.r, color.g, color.b, 0.4f);
+        var playerRenderer = GetComponentInChildren<SpriteRenderer>();
+        var color = playerRenderer.color;
+        playerRenderer.color = new Color(color.r, color.g, color.b, 0.4f);
         yield return new WaitWhile(() => _isInChallenge.Value);
         _speedMultiplier = 2;
         yield return new WaitForSeconds(PostChallengeInvincibilityTimeInSeconds);
         gameObject.GetComponent<CircleCollider2D>().enabled = true;
-        renderer.color = color;
+        playerRenderer.color = color;
         _speedMultiplier = 1;
     }
 
