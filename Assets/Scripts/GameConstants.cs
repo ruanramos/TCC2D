@@ -22,6 +22,7 @@ public static class GameConstants
     public enum ChallengeType
     {
         ButtonPress,
+        KeyboardButtonPress,
         Simulation
     }
 

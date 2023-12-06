@@ -66,9 +66,20 @@ public class GameManager : NetworkBehaviour
         return Instantiate(Resources.Load<GameObject>("Prefabs/ChallengeOuterCanvas")).transform;
     }
 
-    public static void DestroyChallengeCanvas()
+    public static void DestroyChallengeOuterCanvas()
     {
-        Destroy(GameObject.Find("ChallengeCanvas(Clone)"));
+        Destroy(GameObject.Find("ChallengeOuterCanvas(Clone)"));
+    }
+
+    public static Transform InstantiateChallengeInnerCanvas(ChallengeType challengeType)
+    {
+        return Instantiate(Resources.Load<GameObject>($"Prefabs/{(ChallengeType)((int)challengeType)}ChallengeCanvas")).transform;
+        //return Instantiate(Resources.Load<GameObject>($"Prefabs/KeyboardButtonPressChallengeCanvas")).transform;
+    }
+
+    public static void DestroyChallengeInnerCanvas(ChallengeType challengeType)
+    {
+        Destroy(GameObject.Find($"{challengeType}Canvas(Clone)"));
     }
 
     public static void Disconnect()

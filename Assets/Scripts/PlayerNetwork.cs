@@ -34,11 +34,11 @@ public class PlayerNetwork : NetworkBehaviour
         var player = gameObject;
 
         // Renaming gameobject for clarity
-        player.name = $"Player {NetworkManager.LocalClientId}";
+        player.name = $"Player {OwnerClientId}";
 
-        _score.OnValueChanged += TreatCollectibleCollision;
-        _isInChallenge.OnValueChanged += TreatPlayerCollision;
-        _challengeOpponent.OnValueChanged += TreatNewOpponent;
+        _score.OnValueChanged += TreatScoreChanged;
+        _isInChallenge.OnValueChanged += TreatInChallengeChanged;
+        _challengeOpponent.OnValueChanged += TreatOpponentChanged;
         _lives.OnValueChanged += TreatLivesChanged;
         _color.OnValueChanged += TreatColorChanged;
 
@@ -73,9 +73,9 @@ public class PlayerNetwork : NetworkBehaviour
     {
         base.OnNetworkDespawn();
 
-        _score.OnValueChanged -= TreatCollectibleCollision;
-        _isInChallenge.OnValueChanged -= TreatPlayerCollision;
-        _challengeOpponent.OnValueChanged -= TreatNewOpponent;
+        _score.OnValueChanged -= TreatScoreChanged;
+        _isInChallenge.OnValueChanged -= TreatInChallengeChanged;
+        _challengeOpponent.OnValueChanged -= TreatOpponentChanged;
         _lives.OnValueChanged -= TreatLivesChanged;
         _color.OnValueChanged -= TreatColorChanged;
     }
@@ -108,6 +108,7 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
+        // This will run only on server side
         switch (other.gameObject.tag)
         {
             case "Collectible" when !IsServer:
@@ -121,8 +122,9 @@ public class PlayerNetwork : NetworkBehaviour
                 print(
                     $"Collision between players {OwnerClientId} and " +
                     $"{opponentId} happened");
+                _isInChallenge.Value = true;
 
-                StartCoroutine(SimulateChallenge(gameObject, other.gameObject));
+                //StartCoroutine(SimulateChallenge(gameObject, other.gameObject));
                 break;
         }
     }
@@ -135,13 +137,13 @@ public class PlayerNetwork : NetworkBehaviour
         }
     }
 
-    private void TreatNewOpponent(ulong previousOpponent, ulong currentOpponent)
+    private void TreatOpponentChanged(ulong previousOpponent, ulong currentOpponent)
     {
         if (!IsServer) return;
         print($"Player {OwnerClientId} is now challenging player {currentOpponent}");
     }
 
-    private void TreatCollectibleCollision(int previousScore, int currentScore)
+    private void TreatScoreChanged(int previousScore, int currentScore)
     {
         print($"Player {OwnerClientId} had a score of {previousScore}" +
               $" and now has a score of {currentScore}");
@@ -150,13 +152,14 @@ public class PlayerNetwork : NetworkBehaviour
         _scoreText.text = $"Score: {currentScore}";
     }
 
-    private void TreatPlayerCollision(bool wasInChallenge, bool isInChallenge)
+    private void TreatInChallengeChanged(bool wasInChallenge, bool isInChallenge)
     {
         if (!isInChallenge)
         {
             // Left a challenge, remove challenge frame
             if (!IsOwner) return;
-            GameManager.DestroyChallengeCanvas();
+            GameManager.DestroyChallengeOuterCanvas();
+            GameManager.DestroyChallengeInnerCanvas(ChallengeType.KeyboardButtonPress);
             return;
         }
 
@@ -164,9 +167,14 @@ public class PlayerNetwork : NetworkBehaviour
         if (IsOwner)
         {
             // Create challenge outer frame
-            var challengeCanvas = GameManager.InstantiateChallengeOuterCanvas();
-            challengeCanvas.GetComponentInChildren<TextMeshProUGUI>().text =
+            var challengeOuterCanvas = GameManager.InstantiateChallengeOuterCanvas();
+            challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>().text =
                 $"Player {OwnerClientId} X Player {_challengeOpponent.Value}";
+            // Create challenge inner frame
+            GameManager.InstantiateChallengeInnerCanvas(ChallengeType.KeyboardButtonPress);
+            // Run challenge
+            StartCoroutine(KeyboardButtonPressChallenge(gameObject,
+                GameObject.Find($"Player {_challengeOpponent.Value}")));
         }
 
         gameObject.GetComponent<CircleCollider2D>().enabled = false;
@@ -227,6 +235,84 @@ public class PlayerNetwork : NetworkBehaviour
         UpdatePlayerLabel();
     }
 
+    private IEnumerator ButtonPressChallenge(GameObject player1, GameObject player2)
+    {
+        var player1NetworkBehaviour = player1.GetComponent<NetworkBehaviour>();
+        var player2NetworkBehaviour = player2.GetComponent<NetworkBehaviour>();
+        var player1Network = player1.GetComponent<PlayerNetwork>();
+        var player2Network = player2.GetComponent<PlayerNetwork>();
+        var player1Id = player1NetworkBehaviour.OwnerClientId;
+        var player2Id = player2NetworkBehaviour.OwnerClientId;
+
+        if (player1Network._isInChallenge.Value || player2Network._isInChallenge.Value)
+        {
+            print(
+                $"Tried to start button press challenge between players {player1Id}" +
+                $" and {player2Id}, but one of them is already in a challenge");
+            yield break;
+        }
+
+        player1Network._isInChallenge.Value = true;
+        player2Network._isInChallenge.Value = true;
+
+        print($"Starting button press challenge between players {player1Id} and {player2Id}");
+
+        Instantiate(Resources.Load<GameObject>($"Prefabs/{ChallengeType.ButtonPress}Canvas"));
+
+        //yield return new WaitUntil(() => );
+    }
+
+    private IEnumerator KeyboardButtonPressChallenge(GameObject player1, GameObject player2)
+    {
+        var player1NetworkBehaviour = player1.GetComponent<NetworkBehaviour>();
+        var player2NetworkBehaviour = player2.GetComponent<NetworkBehaviour>();
+        var player1Network = player1.GetComponent<PlayerNetwork>();
+        var player2Network = player2.GetComponent<PlayerNetwork>();
+        var player1Id = player1NetworkBehaviour.OwnerClientId;
+        var player2Id = player2NetworkBehaviour.OwnerClientId;
+
+        if (player1Network._isInChallenge.Value || player2Network._isInChallenge.Value)
+        {
+            print(
+                $"Tried to start keyboard button press challenge between players {player1Id}" +
+                $" and {player2Id}, but one of them is already in a challenge");
+            yield break;
+        }
+
+        print($"Starting keyboard button press challenge between players {player1Id} and {player2Id}");
+
+        if (IsOwner)
+        {
+            yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
+        }
+
+        var winner = Random.Range(0, 2) == 0
+            ? player1
+            : player2;
+        var loser = winner == player2
+            ? player1
+            : player2;
+
+        player1Network._isInChallenge.Value = false;
+        player2Network._isInChallenge.Value = false;
+
+        var loserId = loser.GetComponent<NetworkBehaviour>().OwnerClientId;
+        var winnerId = winner.GetComponent<NetworkBehaviour>().OwnerClientId;
+        print(
+            $"Finishing keyboard button press challenge between players {player1Id}" +
+            $" and {player2Id}. Player {winnerId} wins");
+        print($"Removing player {loserId} life");
+        loser.gameObject.GetComponent<PlayerNetwork>()._lives.Value -= 1;
+        if (winner.gameObject.GetComponent<PlayerNetwork>()._lives.Value < MaxLives)
+        {
+            print($"Incrementing player {winnerId} life");
+            winner.gameObject.GetComponent<PlayerNetwork>()._lives.Value += 1;
+            yield break;
+        }
+
+        print($"Could not increment player {winnerId} lives because it is already at max lives");
+    }
+
     private IEnumerator SimulateChallenge(GameObject player1, GameObject player2)
     {
         var player1NetworkBehaviour = player1.GetComponent<NetworkBehaviour>();
@@ -239,7 +325,7 @@ public class PlayerNetwork : NetworkBehaviour
         if (player1Network._isInChallenge.Value || player2Network._isInChallenge.Value)
         {
             print(
-                $"Tried to start challenge simulation coroutine between players {player1Id}" +
+                $"Tried to start challenge simulation between players {player1Id}" +
                 $" and {player2Id}, but one of them is already in a challenge");
             yield break;
         }
@@ -266,7 +352,7 @@ public class PlayerNetwork : NetworkBehaviour
         var loserId = loser.GetComponent<NetworkBehaviour>().OwnerClientId;
         var winnerId = winner.GetComponent<NetworkBehaviour>().OwnerClientId;
         print(
-            $"Finishing challenge simulation coroutine between players {player1Id}" +
+            $"Finishing challenge simulation between players {player1Id}" +
             $" and {player2Id}. Player {winnerId} wins");
         print($"Removing player {loserId} life");
         loser.gameObject.GetComponent<PlayerNetwork>()._lives.Value -= 1;
