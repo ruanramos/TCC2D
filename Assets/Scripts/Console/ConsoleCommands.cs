@@ -48,7 +48,7 @@ namespace Console
         [Command("dcc", "destroy challenge canvas")]
         public static void DestroyChallengeCanvas()
         {
-            GameManager.DestroyChallengeCanvas();
+            GameManager.DestroyChallengeOuterCanvas();
         }
         
         [Command("addLives", "Add life to player")]
