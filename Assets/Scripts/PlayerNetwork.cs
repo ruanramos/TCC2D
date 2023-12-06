@@ -120,6 +120,8 @@ public class PlayerNetwork : NetworkBehaviour
                 var opponentId = other.gameObject.GetComponent<NetworkBehaviour>().OwnerClientId;
                 _challengeOpponent.Value = opponentId;
                 print(
+                    $"Changed challenge opponent value to {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
+                print(
                     $"Collision between players {OwnerClientId} and " +
                     $"{opponentId} happened");
                 _isInChallenge.Value = true;
@@ -168,9 +170,13 @@ public class PlayerNetwork : NetworkBehaviour
         {
             // Create challenge outer frame
             var challengeOuterCanvas = GameManager.InstantiateChallengeOuterCanvas();
+            print($"Creating challenge outer frame at time {NetworkManager.Singleton.ServerTime.Time}");
+            print(
+                $"Challenge opponent is {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
             challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>().text =
                 $"Player {OwnerClientId} X Player {_challengeOpponent.Value}";
             // Create challenge inner frame
+            print($"Creating challenge inner frame at time {NetworkManager.Singleton.ServerTime.Time}");
             GameManager.InstantiateChallengeInnerCanvas(ChallengeType.KeyboardButtonPress);
             // Run challenge
             StartCoroutine(KeyboardButtonPressChallenge(gameObject,
