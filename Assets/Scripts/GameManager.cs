@@ -61,9 +61,9 @@ public class GameManager : NetworkBehaviour
         //print($"Removed collisions from layers {Player} and {InChallengePlayer}");
     }
 
-    public static Transform InstantiateChallengeCanvas()
+    public static Transform InstantiateChallengeOuterCanvas()
     {
-        return Instantiate(Resources.Load<GameObject>("Prefabs/ChallengeCanvas")).transform;
+        return Instantiate(Resources.Load<GameObject>("Prefabs/ChallengeOuterCanvas")).transform;
     }
 
     public static void DestroyChallengeCanvas()

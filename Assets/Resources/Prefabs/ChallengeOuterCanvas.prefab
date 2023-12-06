@@ -150,7 +150,7 @@ GameObject:
   - component: {fileID: 4742989254721368941}
   - component: {fileID: 6579321783523887142}
   m_Layer: 5
-  m_Name: ChallengeCanvas
+  m_Name: ChallengeOuterCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
