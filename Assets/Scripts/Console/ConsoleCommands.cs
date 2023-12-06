@@ -34,15 +34,15 @@ namespace Console
         [Command("score", "")]
         public static void TestCommand()
         {
-            var _scoreText = GameObject.Find("ScoreUI").GetComponentInChildren<TextMeshProUGUI>();
-            Debug.Log($"{_scoreText.text}");
-            Debug.Log($"{_scoreText.enabled}");
+            var scoreText = GameObject.Find("ScoreUI").GetComponentInChildren<TextMeshProUGUI>();
+            Debug.Log($"{scoreText.text}");
+            Debug.Log($"{scoreText.enabled}");
         }
 
         [Command("cc", "instantiate challenge canvas")]
         public static void InstantiateChallengeCanvas()
         {
-            var challengeCanvas = GameManager.InstantiateChallengeCanvas();
+            var challengeCanvas = GameManager.InstantiateChallengeOuterCanvas();
         }
 
         [Command("dcc", "destroy challenge canvas")]
