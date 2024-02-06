@@ -73,7 +73,8 @@ public class GameManager : NetworkBehaviour
 
     public static Transform InstantiateChallengeInnerCanvas(ChallengeType challengeType)
     {
-        return Instantiate(Resources.Load<GameObject>($"Prefabs/{(ChallengeType)((int)challengeType)}ChallengeCanvas")).transform;
+        return Instantiate(Resources.Load<GameObject>($"Prefabs/{(ChallengeType)((int)challengeType)}ChallengeCanvas"))
+            .transform;
         //return Instantiate(Resources.Load<GameObject>($"Prefabs/KeyboardButtonPressChallengeCanvas")).transform;
     }
 
