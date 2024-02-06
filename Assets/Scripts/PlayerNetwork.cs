@@ -104,6 +104,12 @@ public class PlayerNetwork : NetworkBehaviour
         {
             SendClientInputServerRpc(movement);
         }
+
+        if (Input.anyKeyDown)
+        {
+            SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.NetworkTimeSystem.ServerTime,
+                Input.inputString);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D other)
@@ -400,5 +406,13 @@ public class PlayerNetwork : NetworkBehaviour
     public void RemoveLivesServerRpc(int n)
     {
         _lives.Value -= n;
+    }
+
+    [ServerRpc]
+    public void SendKeyboardTimestampToServerServerRpc(double time, string key)
+    {
+        print(
+            $"Received {key} press from client {OwnerClientId}\n" +
+            $"timestamp: {time}  --- Server time: {NetworkManager.Singleton.NetworkTimeSystem.ServerTime}");
     }
 }
