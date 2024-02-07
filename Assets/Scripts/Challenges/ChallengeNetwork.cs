@@ -1,28 +1,54 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
+using Unity.Netcode;
 
-public class ChallengeNetwork : MonoBehaviour
+namespace Challenges
 {
-
-    private ulong _client1Id;
-    private ulong _client2Id;
-
-
-    private void Awake()
+    public class ChallengeNetwork : NetworkBehaviour
     {
-    }
+        private ulong _client1Id;
+        private ulong _client2Id;
+        private static List<ChallengeData> _challenges;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+        private void Awake()
+        {
+            _challenges = new List<ChallengeData>();
+        }
 
-    // Update is called once per frame
-    void Update()
+
+        /*[ClientRpc]
+    public void declareWinnerClientRpc(ClientRpcSendParams clientRpcSendParams)
     {
-        
+    }*/
+
+        public static ulong CalculateFasterClient(ulong client1Id, ulong client2Id, double client1Time,
+            double client2Time)
+        {
+            return client1Time < client2Time ? client1Id : client2Id;
+        }
+
+        public static void CreateChallenge(ulong client1Id, ulong client2Id)
+        {
+            var challengeData = new ChallengeData(client1Id, client2Id);
+            if (_challenges.Any(challenge => challenge.Equals(challengeData))) return;
+            _challenges.Add(challengeData);
+            print($"Created challenge between {client1Id} and {client2Id}");
+        }
+
+        public static void DestroyChallenge(ulong client1Id, ulong client2Id)
+        {
+            foreach (var challenge in _challenges.Where(challenge =>
+                         challenge.Client1Id == client1Id && challenge.Client2Id == client2Id ||
+                         challenge.Client1Id == client2Id && challenge.Client2Id == client1Id))
+            {
+                _challenges.Remove(challenge);
+                break;
+            }
+        }
+
+        public static List<ChallengeData> GetChallenges()
+        {
+            return _challenges;
+        }
     }
 }
