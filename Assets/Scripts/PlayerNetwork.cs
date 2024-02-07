@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Challenges;
 using DefaultNamespace;
 using TMPro;
 using Unity.Netcode;
@@ -105,7 +106,7 @@ public class PlayerNetwork : NetworkBehaviour
             SendClientInputServerRpc(movement);
         }
 
-        if (Input.anyKeyDown)
+        if (Input.GetKeyDown(KeyCode.Space) && _isInChallenge.Value)
         {
             SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.NetworkTimeSystem.ServerTime,
                 Input.inputString);
@@ -131,7 +132,9 @@ public class PlayerNetwork : NetworkBehaviour
                 print(
                     $"Changed {OwnerClientId} challenge opponent value to {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
                 _isInChallenge.Value = true;
-
+                
+                // Server adds the challenge to the list of challenges
+                ChallengeNetwork.CreateChallenge(OwnerClientId, _challengeOpponent.Value);
                 //StartCoroutine(SimulateChallenge(gameObject, other.gameObject));
                 break;
         }
@@ -154,7 +157,17 @@ public class PlayerNetwork : NetworkBehaviour
 
         if (!IsServer && IsOwner)
         {
-            StartChallengeInClient();
+            // Create challenge outer frame
+            var challengeOuterCanvas = GameManager.InstantiateChallengeOuterCanvas();
+            print($"Creating challenge outer frame at time {NetworkManager.Singleton.ServerTime.Time}");
+            print(
+                $"Challenge opponent is {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
+            challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>().text =
+                $"Player {OwnerClientId} X Player {_challengeOpponent.Value}";
+            //StartChallengeInClient();
+            /*print($"Starting coroutine of challenge simulation between players {OwnerClientId}" +
+                  $" and {_challengeOpponent.Value}");
+            StartCoroutine(SimulateChallenge(gameObject, GameObject.Find($"Player {_challengeOpponent.Value}")));*/
         }
     }
 
@@ -181,7 +194,6 @@ public class PlayerNetwork : NetworkBehaviour
         // Entered a challenge
         if (IsOwner)
         {
-            //StartChallengeInClient();
         }
 
         gameObject.GetComponent<CircleCollider2D>().enabled = false;
@@ -200,6 +212,7 @@ public class PlayerNetwork : NetworkBehaviour
         // Create challenge inner frame
         print($"Creating challenge inner frame at time {NetworkManager.Singleton.ServerTime.Time}");
         GameManager.InstantiateChallengeInnerCanvas(ChallengeType.KeyboardButtonPress);
+
         // Run challenge
         StartCoroutine(KeyboardButtonPressChallenge(gameObject,
             GameObject.Find($"Player {_challengeOpponent.Value}")));
