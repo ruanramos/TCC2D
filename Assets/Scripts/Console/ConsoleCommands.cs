@@ -1,6 +1,6 @@
-﻿using QFSW.QC;
+﻿using Challenges;
+using QFSW.QC;
 using TMPro;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace Console
@@ -50,7 +50,7 @@ namespace Console
         {
             GameManager.DestroyChallengeOuterCanvas();
         }
-        
+
         [Command("addLives", "Add life to player")]
         public static void AddLives(ulong clientId, int n)
         {
@@ -61,7 +61,7 @@ namespace Console
                 break;
             }
         }
-        
+
         [Command("removeLives", "Add life to player")]
         public static void RemoveLives(ulong clientId, int n)
         {
@@ -70,6 +70,15 @@ namespace Console
                 if (playerNetwork.OwnerClientId != clientId) continue;
                 playerNetwork.RemoveLivesServerRpc(n);
                 break;
+            }
+        }
+
+        [Command("challenges", "Prints the challenges happening")]
+        public static void ChallengesHappening()
+        {
+            foreach (var challenge in ChallengeNetwork.GetChallenges())
+            {
+                Debug.Log($"Challenge between {challenge.Client1Id} and {challenge.Client2Id}");
             }
         }
     }
