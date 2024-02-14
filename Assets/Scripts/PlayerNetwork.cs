@@ -1,6 +1,6 @@
 ﻿using System.Collections;
+using System.Linq;
 using Challenges;
-using DefaultNamespace;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Components;
@@ -13,35 +13,35 @@ public class PlayerNetwork : NetworkBehaviour
     private NetworkTransform _transform;
     private TextMeshPro _playerLabelText;
     private TextMeshProUGUI _scoreText;
-    private SpriteRenderer _challengeImage;
     private float _speedMultiplier = 1;
+    private PlayerVisuals _visuals;
 
 
     private NetworkVariable<int> _score = new();
     private NetworkVariable<bool> _isInChallenge = new();
     private NetworkVariable<ulong> _challengeOpponent = new();
+    private GameObject _challenge = new();
     private NetworkVariable<int> _lives = new(StartingLives);
-    private NetworkVariable<Color> _color = new();
 
 
     private void Awake()
     {
         _scoreText = GameObject.Find("ScoreUI").GetComponentInChildren<TextMeshProUGUI>();
-        _challengeImage = Utilities.FindChildGameObjectByName(transform, "Swords").GetComponent<SpriteRenderer>();
+        _visuals = gameObject.AddComponent<PlayerVisuals>();
     }
 
     public override void OnNetworkSpawn()
     {
         var player = gameObject;
 
-        // Renaming gameobject for clarity
+        // Renaming gameobject for clarity in hierarchy
         player.name = $"Player {OwnerClientId}";
 
         _score.OnValueChanged += TreatScoreChanged;
         _isInChallenge.OnValueChanged += TreatInChallengeChanged;
         _challengeOpponent.OnValueChanged += TreatOpponentChanged;
         _lives.OnValueChanged += TreatLivesChanged;
-        _color.OnValueChanged += TreatColorChanged;
+
 
         _playerLabelText = player.GetComponentInChildren<TextMeshPro>();
         UpdatePlayerLabel();
@@ -55,30 +55,17 @@ public class PlayerNetwork : NetworkBehaviour
             case true:
                 print($"Applying starting score of 0 on owner (ownerclientid) {OwnerClientId}");
                 _scoreText.text = "Score: 0";
-                SetUpColorServerRpc();
                 break;
         }
-
-        gameObject.GetComponentInChildren<SpriteRenderer>().color = _color.Value;
-    }
-
-    [ServerRpc]
-    private void SetUpColorServerRpc(ServerRpcParams serverRpcParams = default)
-    {
-        if (!IsServer) return;
-        _color.Value = Random.ColorHSV();
-        gameObject.GetComponentInChildren<SpriteRenderer>().color = _color.Value;
     }
 
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
-
         _score.OnValueChanged -= TreatScoreChanged;
         _isInChallenge.OnValueChanged -= TreatInChallengeChanged;
         _challengeOpponent.OnValueChanged -= TreatOpponentChanged;
         _lives.OnValueChanged -= TreatLivesChanged;
-        _color.OnValueChanged -= TreatColorChanged;
     }
 
     [ServerRpc]
@@ -95,12 +82,9 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void Update()
     {
-        //_challengeImage.enabled = _isInChallenge.Value;
-
         if (!IsOwner) return;
 
         var movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-
         if (movement.magnitude > 0 && !_isInChallenge.Value)
         {
             SendClientInputServerRpc(movement);
@@ -118,12 +102,10 @@ public class PlayerNetwork : NetworkBehaviour
         // This will run only on server side
         switch (other.gameObject.tag)
         {
-            case "Collectible" when !IsServer:
-                return;
-            case "Collectible":
+            case CollectibleTag:
                 _score.Value += CollectibleValue;
                 break;
-            case "Player":
+            case PlayerTag:
                 var opponentId = other.gameObject.GetComponent<NetworkBehaviour>().OwnerClientId;
                 print(
                     $"Collision between players {OwnerClientId} and " +
@@ -132,50 +114,36 @@ public class PlayerNetwork : NetworkBehaviour
                 print(
                     $"Changed {OwnerClientId} challenge opponent value to {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
                 _isInChallenge.Value = true;
-                
-                // Server adds the challenge to the list of challenges
-                ChallengeNetwork.CreateChallenge(OwnerClientId, _challengeOpponent.Value);
-                //StartCoroutine(SimulateChallenge(gameObject, other.gameObject));
-                break;
-        }
-    }
 
-    private void TreatColorChanged(Color previousColor, Color currentColor)
-    {
-        if (!IsServer)
-        {
-            gameObject.GetComponentInChildren<SpriteRenderer>().color = currentColor;
+                // Server adds the challenge to the list of challenges and client store reference to it
+                //_challenge.Value = ChallengeNetwork.CreateChallenge(OwnerClientId, _challengeOpponent.Value);
+                break;
         }
     }
 
     private void TreatOpponentChanged(ulong previousOpponent, ulong currentOpponent)
     {
-        if (IsServer)
+        if (IsServer && currentOpponent != 0)
         {
             print($"Player {OwnerClientId} is now challenging player {currentOpponent}");
         }
 
-        if (!IsServer && IsOwner)
+        if (!IsServer && IsOwner && _challengeOpponent.Value != 0)
         {
-            // Create challenge outer frame
-            var challengeOuterCanvas = GameManager.InstantiateChallengeOuterCanvas();
-            print($"Creating challenge outer frame at time {NetworkManager.Singleton.ServerTime.Time}");
-            print(
-                $"Challenge opponent is {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
-            challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>().text =
-                $"Player {OwnerClientId} X Player {_challengeOpponent.Value}";
-            //StartChallengeInClient();
-            /*print($"Starting coroutine of challenge simulation between players {OwnerClientId}" +
-                  $" and {_challengeOpponent.Value}");
-            StartCoroutine(SimulateChallenge(gameObject, GameObject.Find($"Player {_challengeOpponent.Value}")));*/
+            // Create challenge gameobject
+            _challenge = Instantiate(Resources.Load<GameObject>("Prefabs/Challenge"));
         }
     }
 
     private void TreatScoreChanged(int previousScore, int currentScore)
     {
-        print($"Player {OwnerClientId} had a score of {previousScore}" +
-              $" and now has a score of {currentScore}");
-        if (IsServer) return;
+        if (IsServer)
+        {
+            print($"Player {OwnerClientId} had a score of {previousScore}" +
+                  $" and now has a score of {currentScore}");
+            return;
+        }
+
         if (!IsOwner) return;
         _scoreText.text = $"Score: {currentScore}";
     }
@@ -186,18 +154,16 @@ public class PlayerNetwork : NetworkBehaviour
         {
             // Left a challenge, remove challenge frame
             if (!IsOwner) return;
-            GameManager.DestroyChallengeOuterCanvas();
-            GameManager.DestroyChallengeInnerCanvas(ChallengeType.KeyboardButtonPress);
+            StartCoroutine(PlayerPostChallengeBehavior(PostChallengeSpeedMultiplier));
+            Destroy(_challenge);
+            //GameManager.DestroyChallengeOuterCanvas();
+            //GameManager.DestroyChallengeInnerCanvas(ChallengeType.KeyboardButtonPress);
             return;
         }
 
         // Entered a challenge
-        if (IsOwner)
-        {
-        }
-
         gameObject.GetComponent<CircleCollider2D>().enabled = false;
-        StartCoroutine(MakePlayerTransparentWhileInChallenge());
+        StartCoroutine(_visuals.MakePlayerTransparentWhileInChallenge());
     }
 
     private void StartChallengeInClient()
@@ -218,16 +184,11 @@ public class PlayerNetwork : NetworkBehaviour
             GameObject.Find($"Player {_challengeOpponent.Value}")));
     }
 
-    private IEnumerator MakePlayerTransparentWhileInChallenge()
+    private IEnumerator PlayerPostChallengeBehavior(float multiplier)
     {
-        var playerRenderer = GetComponentInChildren<SpriteRenderer>();
-        var color = playerRenderer.color;
-        playerRenderer.color = new Color(color.r, color.g, color.b, 0.4f);
-        yield return new WaitWhile(() => _isInChallenge.Value);
-        _speedMultiplier = 2;
+        _speedMultiplier = multiplier;
         yield return new WaitForSeconds(PostChallengeInvincibilityTimeInSeconds);
         gameObject.GetComponent<CircleCollider2D>().enabled = true;
-        playerRenderer.color = color;
         _speedMultiplier = 1;
     }
 
@@ -255,7 +216,6 @@ public class PlayerNetwork : NetworkBehaviour
                 $"Player {OwnerClientId} lost a challenge and lost 1 life." +
                 $" It had {previousLives} Now it has {currentLives}");
         }
-
 
         if (currentLives > previousLives)
         {
@@ -427,5 +387,11 @@ public class PlayerNetwork : NetworkBehaviour
         print(
             $"Received {key} press from client {OwnerClientId}\n" +
             $"timestamp: {time}  --- Server time: {NetworkManager.Singleton.NetworkTimeSystem.ServerTime}");
+        print($"Will change _challengeData to add timestamp for client {OwnerClientId}");
+    }
+
+    public bool GetIsInChallenge()
+    {
+        return _isInChallenge.Value;
     }
 }

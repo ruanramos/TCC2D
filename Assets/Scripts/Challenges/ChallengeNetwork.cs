@@ -8,31 +8,37 @@ namespace Challenges
     {
         private ulong _client1Id;
         private ulong _client2Id;
-        private static List<ChallengeData> _challenges;
+        private static HashSet<Challenge> _challenges;
 
         private void Awake()
         {
-            _challenges = new List<ChallengeData>();
+            _challenges = new HashSet<Challenge>();
         }
 
-
-        /*[ClientRpc]
-    public void declareWinnerClientRpc(ClientRpcSendParams clientRpcSendParams)
-    {
-    }*/
-
-        public static ulong CalculateFasterClient(ulong client1Id, ulong client2Id, double client1Time,
-            double client2Time)
+        public static ulong CalculateFasterClient(Challenge challenge)
         {
-            return client1Time < client2Time ? client1Id : client2Id;
+            var client1Time = challenge.ClientFinishTimestamps[challenge.Client1Id];
+            var client2Time = challenge.ClientFinishTimestamps[challenge.Client2Id];
+            return client1Time < client2Time ? challenge.Client1Id : challenge.Client2Id;
         }
 
-        public static void CreateChallenge(ulong client1Id, ulong client2Id)
+        public static Challenge CreateChallenge(ulong client1Id, ulong client2Id)
         {
-            var challengeData = new ChallengeData(client1Id, client2Id);
-            if (_challenges.Any(challenge => challenge.Equals(challengeData))) return;
+            var existingChallenge = _challenges.FirstOrDefault(challenge =>
+                challenge.Client1Id == client1Id && challenge.Client2Id == client2Id ||
+                challenge.Client1Id == client2Id && challenge.Client2Id == client1Id
+            );
+
+            print($"Existing challenge: {existingChallenge}");
+
+            if (existingChallenge != null && existingChallenge.Client1Id != 0) return existingChallenge;
+            
+            var challengeData = new Challenge(client1Id, client2Id);
+
             _challenges.Add(challengeData);
             print($"Created challenge between {client1Id} and {client2Id}");
+
+            return challengeData;
         }
 
         public static void DestroyChallenge(ulong client1Id, ulong client2Id)
@@ -46,7 +52,7 @@ namespace Challenges
             }
         }
 
-        public static List<ChallengeData> GetChallenges()
+        public static HashSet<Challenge> GetChallenges()
         {
             return _challenges;
         }

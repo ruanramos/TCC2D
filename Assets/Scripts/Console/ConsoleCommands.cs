@@ -81,5 +81,18 @@ namespace Console
                 Debug.Log($"Challenge between {challenge.Client1Id} and {challenge.Client2Id}");
             }
         }
+        
+        [Command("challenge", "Prints the challenges happening")]
+        public static void ChallengesHappening(ulong clientId)
+        {
+            foreach (var challenge in ChallengeNetwork.GetChallenges())
+            {
+                
+                if (challenge.Client1Id == clientId || challenge.Client2Id == clientId)
+                {
+                    Debug.Log($"Challenge between {challenge.Client1Id} and {challenge.Client2Id}");
+                }
+            }
+        }
     }
 }

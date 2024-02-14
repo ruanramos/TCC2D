@@ -18,6 +18,8 @@ public static class GameConstants
     // Challenges
     public const int ChallengeValue = 50;
     public const float PostChallengeInvincibilityTimeInSeconds = 3f;
+    public const float PostChallengeSpeedMultiplier = 2f;
+    public const float PlayerAlphaWhileInChallenge = 0.4f;
 
     public enum ChallengeType
     {
@@ -46,4 +48,8 @@ public static class GameConstants
     // Debug
     public const bool DebugMode = true;
     public const int ChallengeSimulationTimeInSeconds = 10;
+    
+    // Tags
+    public const string PlayerTag = "Player";
+    public const string CollectibleTag = "Collectible";
 }
