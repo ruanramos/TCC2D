@@ -15,14 +15,14 @@ namespace Challenges
             _challenges = new HashSet<Challenge>();
         }
 
-        public static ulong CalculateFasterClient(Challenge challenge)
+        /*public static ulong CalculateFasterClient(Challenge challenge)
         {
-            var client1Time = challenge.ClientFinishTimestamps[challenge.Client1Id];
-            var client2Time = challenge.ClientFinishTimestamps[challenge.Client2Id];
-            return client1Time < client2Time ? challenge.Client1Id : challenge.Client2Id;
-        }
+            /*var client1Time = challenge.ClientFinishTimestamps[challenge.Client1Id];
+            var client2Time = challenge.ClientFinishTimestamps[challenge.Client2Id];#1#
+            //return client1Time < client2Time ? challenge.Client1Id : challenge.Client2Id;
+        }*/
 
-        public static Challenge CreateChallenge(ulong client1Id, ulong client2Id)
+        /*public static Challenge CreateChallenge(ulong client1Id, ulong client2Id)
         {
             var existingChallenge = _challenges.FirstOrDefault(challenge =>
                 challenge.Client1Id == client1Id && challenge.Client2Id == client2Id ||
@@ -33,13 +33,13 @@ namespace Challenges
 
             if (existingChallenge != null && existingChallenge.Client1Id != 0) return existingChallenge;
             
-            var challengeData = new Challenge(client1Id, client2Id);
+            var challengeData = gameObject.AddComponent<Challenge>();
 
             _challenges.Add(challengeData);
             print($"Created challenge between {client1Id} and {client2Id}");
 
             return challengeData;
-        }
+        }*/
 
         public static void DestroyChallenge(ulong client1Id, ulong client2Id)
         {
