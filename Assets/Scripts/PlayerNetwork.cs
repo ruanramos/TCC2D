@@ -42,7 +42,6 @@ public class PlayerNetwork : NetworkBehaviour
         _challengeOpponent.OnValueChanged += TreatOpponentChanged;
         _lives.OnValueChanged += TreatLivesChanged;
 
-
         _playerLabelText = player.GetComponentInChildren<TextMeshPro>();
         UpdatePlayerLabel();
         _playerLabelText.color = Color.green;
@@ -89,12 +88,6 @@ public class PlayerNetwork : NetworkBehaviour
         {
             SendClientInputServerRpc(movement);
         }
-
-        if (Input.GetKeyDown(KeyCode.Space) && _isInChallenge.Value)
-        {
-            SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.NetworkTimeSystem.ServerTime,
-                Input.inputString);
-        }
     }
 
     private void OnCollisionEnter2D(Collision2D other)
@@ -123,16 +116,36 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void TreatOpponentChanged(ulong previousOpponent, ulong currentOpponent)
     {
+        _challenge = Resources.Load<GameObject>("Prefabs/Challenge");
+        _challenge.GetComponent<Challenge>().Client1Id = OwnerClientId;
+        _challenge.GetComponent<Challenge>().Client2Id = currentOpponent;
+        
+        if (!IsServer && IsOwner && _challengeOpponent.Value != 0)
+        {
+            print("Player is challenging another player");
+            _challenge = Instantiate(_challenge);
+            print("Instantiated challenge gameobject");
+            var challengeScript = _challenge.gameObject.GetComponent<Challenge>();
+            challengeScript.Client1Id = OwnerClientId;
+            challengeScript.Client2Id = currentOpponent;
+            challengeScript.UpdateHeader();
+            print("Set challenge client ids");
+            // enable children gameobjects
+            _challenge.transform.GetChild(0).gameObject.SetActive(true);
+            //_challenge.transform.GetChild(1).gameObject.SetActive(true);
+        }
         if (IsServer && currentOpponent != 0)
         {
             print($"Player {OwnerClientId} is now challenging player {currentOpponent}");
+            // Create challenge gameobject in network
+            _challenge.gameObject.GetComponent<NetworkObject>().Spawn(destroyWithScene: true);
+            /*_challenge = Resources.Load<GameObject>("Prefabs/Challenge");
+            _challenge.gameObject.GetComponent<Challenge>().Client1Id = OwnerClientId;
+            _challenge.gameObject.GetComponent<Challenge>().Client2Id = currentOpponent;
+            */
         }
 
-        if (!IsServer && IsOwner && _challengeOpponent.Value != 0)
-        {
-            // Create challenge gameobject
-            _challenge = Instantiate(Resources.Load<GameObject>("Prefabs/Challenge"));
-        }
+        
     }
 
     private void TreatScoreChanged(int previousScore, int currentScore)
@@ -155,7 +168,7 @@ public class PlayerNetwork : NetworkBehaviour
             // Left a challenge, remove challenge frame
             if (!IsOwner) return;
             StartCoroutine(PlayerPostChallengeBehavior(PostChallengeSpeedMultiplier));
-            Destroy(_challenge);
+            _challenge.gameObject.GetComponent<NetworkObject>().Despawn();
             //GameManager.DestroyChallengeOuterCanvas();
             //GameManager.DestroyChallengeInnerCanvas(ChallengeType.KeyboardButtonPress);
             return;
@@ -379,15 +392,6 @@ public class PlayerNetwork : NetworkBehaviour
     public void RemoveLivesServerRpc(int n)
     {
         _lives.Value -= n;
-    }
-
-    [ServerRpc]
-    public void SendKeyboardTimestampToServerServerRpc(double time, string key)
-    {
-        print(
-            $"Received {key} press from client {OwnerClientId}\n" +
-            $"timestamp: {time}  --- Server time: {NetworkManager.Singleton.NetworkTimeSystem.ServerTime}");
-        print($"Will change _challengeData to add timestamp for client {OwnerClientId}");
     }
 
     public bool GetIsInChallenge()
