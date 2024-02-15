@@ -20,7 +20,7 @@ public class PlayerNetwork : NetworkBehaviour
     private NetworkVariable<int> _score = new();
     private NetworkVariable<bool> _isInChallenge = new();
     private NetworkVariable<ulong> _challengeOpponent = new();
-    private GameObject _challenge = new();
+    private GameObject _challenge;
     private NetworkVariable<int> _lives = new(StartingLives);
 
 
