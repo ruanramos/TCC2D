@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using static GameConstants;
 
-public class PlayerVisuals: NetworkBehaviour
+public class PlayerVisuals : NetworkBehaviour
 {
     private NetworkVariable<Color> _color = new();
 
@@ -30,11 +31,12 @@ public class PlayerVisuals: NetworkBehaviour
     {
         var playerRenderer = GetComponentInChildren<SpriteRenderer>();
         var color = playerRenderer.color;
-        playerRenderer.color = new Color(color.r, color.g, color.b, GameConstants.PlayerAlphaWhileInChallenge);
-        yield return new WaitWhile(() =>  GetComponent<PlayerNetwork>().GetIsInChallenge());
+        playerRenderer.color = new Color(color.r, color.g, color.b, PlayerAlphaWhileInChallenge);
+        yield return new WaitWhile(() => GetComponent<PlayerNetwork>().GetIsInChallenge());
+        yield return new WaitForSeconds(PostChallengeInvincibilityTimeInSeconds);
         playerRenderer.color = color;
     }
-    
+
     [ServerRpc]
     private void SetUpColorServerRpc(ServerRpcParams serverRpcParams = default)
     {
