@@ -205,20 +205,6 @@ public class PlayerNetwork : NetworkBehaviour
         var player1Id = player1NetworkBehaviour.OwnerClientId;
         var player2Id = player2NetworkBehaviour.OwnerClientId;
 
-        /*if (player1Network._isInChallenge.Value || player2Network._isInChallenge.Value)
-        {
-            print(
-                $"Tried to start challenge simulation between players {player1Id}" +
-                $" and {player2Id}, but one of them is already in a challenge");
-            yield break;
-        }
-
-        print(
-            $"Starting challenge simulation coroutine between players {player1Id}" +
-            $" and {player2Id}");
-        player1Network._isInChallenge.Value = true;
-        player2Network._isInChallenge.Value = true;*/
-
         yield return new WaitForSeconds(ChallengeSimulationTimeInSeconds);
 
         var winner = Random.Range(0, 2) == 0
