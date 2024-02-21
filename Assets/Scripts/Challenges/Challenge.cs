@@ -13,29 +13,21 @@ namespace Challenges
 
         private TextMeshProUGUI _challengeHeader;
 
-        //public Dictionary<ulong, double> ClientFinishTimestamps;
-
         public Challenge(ulong client1Id, ulong client2Id)
         {
             Client1Id = client1Id;
             Client2Id = client2Id;
-            //ClientFinishTimestamps = new Dictionary<ulong, double>();
         }
 
         public Challenge()
         {
             Client1Id = 0;
             Client2Id = 0;
-            //ClientFinishTimestamps = new Dictionary<ulong, double>();
         }
 
         private void Awake()
         {
-            transform.GetChild(0).gameObject.SetActive(true);
-            transform.GetChild(0).gameObject.SetActive(true);
-            _challengeHeader = GameObject.Find("ChallengeHeader").GetComponent<TextMeshProUGUI>();
-            transform.GetChild(0).gameObject.SetActive(false);
-            transform.GetChild(0).gameObject.SetActive(false);
+            //_challengeHeader = GameObject.Find("ChallengeHeader").GetComponent<TextMeshProUGUI>();
         }
 
         private void Update()
@@ -95,20 +87,10 @@ namespace Challenges
                 writer.WriteValueSafe(client2Id);
             }
         }
-
-        public void AddClientFinishTimestamp(ulong client, double timestamp)
-        {
-            //ClientFinishTimestamps.Add(client, timestamp);
-        }
         
-        // Create a toString method that returns the client IDs and their finish times
         public override string ToString()
         {
             var result = $"{Client1Id} x {Client2Id}: ";
-            // foreach (var client in ClientFinishTimestamps)
-            // {
-            //     result += $"Client {client.Key} finished at {client.Value}\n";
-            // }
             return result;
         }
     }
