@@ -57,30 +57,6 @@ public class GameManager : NetworkBehaviour
     private void Start()
     {
         _devInfo.SetActive(false);
-        //Physics.IgnoreLayerCollision((int)Player, (int)InChallengePlayer);
-        //print($"Removed collisions from layers {Player} and {InChallengePlayer}");
-    }
-
-    public static Transform InstantiateChallengeOuterCanvas()
-    {
-        return Instantiate(Resources.Load<GameObject>("Prefabs/ChallengeOuterCanvas")).transform;
-    }
-
-    public static void DestroyChallengeOuterCanvas()
-    {
-        Destroy(GameObject.Find("ChallengeOuterCanvas(Clone)"));
-    }
-
-    public static Transform InstantiateChallengeInnerCanvas(ChallengeType challengeType)
-    {
-        return Instantiate(Resources.Load<GameObject>($"Prefabs/{(ChallengeType)((int)challengeType)}ChallengeCanvas"))
-            .transform;
-        //return Instantiate(Resources.Load<GameObject>($"Prefabs/KeyboardButtonPressChallengeCanvas")).transform;
-    }
-
-    public static void DestroyChallengeInnerCanvas(ChallengeType challengeType)
-    {
-        Destroy(GameObject.Find($"{challengeType}Canvas(Clone)"));
     }
 
     public static void Disconnect()

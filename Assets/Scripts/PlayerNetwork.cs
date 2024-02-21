@@ -217,7 +217,6 @@ public class PlayerNetwork : NetworkBehaviour
         player1Network._isInChallenge.Value = false;
         player2Network._isInChallenge.Value = false;
 
-
         var loserId = loser.GetComponent<NetworkBehaviour>().OwnerClientId;
         var winnerId = winner.GetComponent<NetworkBehaviour>().OwnerClientId;
         print(
