@@ -43,7 +43,7 @@ public class PlayerNetwork : NetworkBehaviour
 
         _playerLabelText = player.GetComponentInChildren<TextMeshPro>();
         UpdatePlayerLabel();
-        _playerLabelText.color = Color.green;
+        _playerLabelText.color = Color.blue;
 
         switch (IsOwner)
         {
