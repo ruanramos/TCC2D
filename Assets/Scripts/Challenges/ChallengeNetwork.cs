@@ -52,5 +52,12 @@ namespace Challenges
         {
             _challenges.Remove(challenge);
         }
+
+        public static Challenge GetChallenge(ulong client1Id, ulong client2Id)
+        {
+            return _challenges.Select(challenge => challenge.GetComponent<Challenge>()).FirstOrDefault(component =>
+                component.Client1Id == client1Id && component.Client2Id == client2Id ||
+                component.Client1Id == client2Id && component.Client2Id == client1Id);
+        }
     }
 }
