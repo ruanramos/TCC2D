@@ -140,9 +140,13 @@ public class PlayerNetwork : NetworkBehaviour
             if (IsServer)
             {
                 // Server will despawn and destroy challenge object
-                _currentChallenge.GetComponent<NetworkObject>().Despawn();
-                print(
-                    $"Despawned challenge network object for players {OwnerClientId} and {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
+                if (ChallengeNetwork.ChallengeExists(OwnerClientId, _challengeOpponent.Value))
+                {
+                    ChallengeNetwork.RemoveChallenge(_currentChallenge);
+                    _currentChallenge.GetComponent<NetworkObject>().Despawn();
+                    print(
+                        $"Despawned challenge network object for players {OwnerClientId} and {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
+                }
             }
 
             if (!IsOwner) return;

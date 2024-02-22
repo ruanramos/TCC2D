@@ -47,5 +47,10 @@ namespace Challenges
                 component.Client1Id == client1Id && component.Client2Id == client2Id ||
                 component.Client1Id == client2Id && component.Client2Id == client1Id);
         }
+
+        public static void RemoveChallenge(GameObject challenge)
+        {
+            _challenges.Remove(challenge);
+        }
     }
 }
