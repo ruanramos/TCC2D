@@ -141,8 +141,8 @@ public class PlayerNetwork : NetworkBehaviour
             {
                 // Server will despawn and destroy challenge object
                 _currentChallenge.GetComponent<NetworkObject>().Despawn();
-                print($"Despawned challenge network object for players {OwnerClientId} and {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
-                
+                print(
+                    $"Despawned challenge network object for players {OwnerClientId} and {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
             }
 
             if (!IsOwner) return;
@@ -163,7 +163,8 @@ public class PlayerNetwork : NetworkBehaviour
             _currentChallenge.GetComponent<Challenge>().Client2Id = _challengeOpponent.Value;
             ChallengeNetwork.AddNewChallenge(_currentChallenge);
             _currentChallenge.GetComponent<NetworkObject>().Spawn();
-            print($"Spawned challenge network object for players {OwnerClientId} and {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
+            print(
+                $"Spawned challenge network object for players {OwnerClientId} and {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
         }
 
         StartCoroutine(_visuals.MakePlayerTransparentWhileInChallenge());
@@ -244,11 +245,9 @@ public class PlayerNetwork : NetworkBehaviour
         print(
             $"Finishing challenge simulation between players {player1Id}" +
             $" and {player2Id}. Player {winnerId} wins");
-        print($"Removing player {loserId} life");
         loser.gameObject.GetComponent<PlayerNetwork>()._lives.Value -= 1;
         if (winner.gameObject.GetComponent<PlayerNetwork>()._lives.Value < MaxLives)
         {
-            print($"Incrementing player {winnerId} life");
             winner.gameObject.GetComponent<PlayerNetwork>()._lives.Value += 1;
             yield break;
         }
