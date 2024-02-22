@@ -113,8 +113,11 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void TreatOpponentChanged(ulong previousOpponent, ulong currentOpponent)
     {
-        print(
-            $"Player {OwnerClientId} challenge opponent changed from {previousOpponent} to {currentOpponent} at time {NetworkManager.Singleton.ServerTime.Time}");
+        if (IsServer)
+        {
+            print(
+                $"Player {OwnerClientId} challenge opponent changed from {previousOpponent} to {currentOpponent} at time {NetworkManager.Singleton.ServerTime.Time}");
+        }
     }
 
     private void TreatScoreChanged(int previousScore, int currentScore)
@@ -132,8 +135,11 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void TreatInChallengeChanged(bool wasInChallenge, bool isInChallenge)
     {
-        print(
-            $"Player {OwnerClientId} isInChallenge changed from {wasInChallenge} to {isInChallenge} at time {NetworkManager.Singleton.ServerTime.Time}");
+        if (IsServer)
+        {
+            print(
+                $"Player {OwnerClientId} isInChallenge changed from {wasInChallenge} to {isInChallenge} at time {NetworkManager.Singleton.ServerTime.Time}");
+        }
         if (!isInChallenge)
         {
             StartCoroutine(PlayerPostChallengeBehavior(PostChallengeSpeedMultiplier));
@@ -203,19 +209,22 @@ public class PlayerNetwork : NetworkBehaviour
         if (currentLives < previousLives)
         {
             // Lost challenge
-            print(
-                $"Player {OwnerClientId} lost a challenge and lost 1 life." +
-                $" It had {previousLives} Now it has {currentLives}");
+            if (IsServer)
+            {
+                print(
+                    $"Player {OwnerClientId} lost a challenge and lost 1 life." +
+                    $" It had {previousLives} Now it has {currentLives}");
+            }
         }
 
         if (currentLives > previousLives)
         {
             // Won challenge
-            print(
-                $"Player {OwnerClientId} won a challenge and earned 1 life." +
-                $" It had {previousLives} Now it has {currentLives}");
             if (IsServer)
             {
+                print(
+                    $"Player {OwnerClientId} won a challenge and earned 1 life." +
+                    $" It had {previousLives} Now it has {currentLives}");
                 _score.Value += ChallengeValue;
             }
         }
