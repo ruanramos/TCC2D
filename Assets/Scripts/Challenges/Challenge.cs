@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -25,11 +24,6 @@ namespace Challenges
             Client2Id = 0;
         }
 
-        private void Awake()
-        {
-            //_challengeHeader = GameObject.Find("ChallengeHeader").GetComponent<TextMeshProUGUI>();
-        }
-
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Space) && IsOwner)
@@ -38,7 +32,7 @@ namespace Challenges
                     Input.inputString);
             }
         }
-        
+
         [ServerRpc]
         private void SendKeyboardTimestampToServerServerRpc(double time, string key)
         {
@@ -50,12 +44,7 @@ namespace Challenges
 
         public override void OnNetworkSpawn()
         {
-            UpdateHeader();
-        }
-
-        public void UpdateHeader()
-        {
-            _challengeHeader.text = $"Player {Client1Id} x Player {Client2Id}";
+            // Check if owner is involved in challenge
         }
 
         public override void OnNetworkDespawn()
@@ -87,7 +76,7 @@ namespace Challenges
                 writer.WriteValueSafe(client2Id);
             }
         }
-        
+
         public override string ToString()
         {
             var result = $"{Client1Id} x {Client2Id}: ";

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Challenges;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Components;
@@ -18,7 +19,7 @@ public class PlayerNetwork : NetworkBehaviour
     private NetworkVariable<int> _score = new();
     private NetworkVariable<bool> _isInChallenge = new();
     private NetworkVariable<ulong> _challengeOpponent = new();
-    private GameObject _challenge;
+    private GameObject _currentChallenge;
     private NetworkVariable<int> _lives = new(StartingLives);
 
 
@@ -136,6 +137,14 @@ public class PlayerNetwork : NetworkBehaviour
         if (!isInChallenge)
         {
             StartCoroutine(PlayerPostChallengeBehavior(PostChallengeSpeedMultiplier));
+            if (IsServer)
+            {
+                // Server will despawn and destroy challenge object
+                _currentChallenge.GetComponent<NetworkObject>().Despawn();
+                print($"Despawned challenge network object for players {OwnerClientId} and {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
+                
+            }
+
             if (!IsOwner) return;
             return;
         }
@@ -144,6 +153,19 @@ public class PlayerNetwork : NetworkBehaviour
         print($"Player {OwnerClientId} entered a challenge at time {NetworkManager.Singleton.ServerTime.Time}");
         gameObject.GetComponent<CircleCollider2D>().enabled = false;
         gameObject.GetComponent<NetworkRigidbody2D>().enabled = false;
+
+        if (IsServer && !ChallengeNetwork.ChallengeExists(OwnerClientId, _challengeOpponent.Value))
+        {
+            // Server will create challenge object and spawn
+            var challengePrefab = Resources.Load<GameObject>("Prefabs/Challenge");
+            _currentChallenge = Instantiate(challengePrefab, transform.position, Quaternion.identity);
+            _currentChallenge.GetComponent<Challenge>().Client1Id = OwnerClientId;
+            _currentChallenge.GetComponent<Challenge>().Client2Id = _challengeOpponent.Value;
+            ChallengeNetwork.AddNewChallenge(_currentChallenge);
+            _currentChallenge.GetComponent<NetworkObject>().Spawn();
+            print($"Spawned challenge network object for players {OwnerClientId} and {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
+        }
+
         StartCoroutine(_visuals.MakePlayerTransparentWhileInChallenge());
     }
 

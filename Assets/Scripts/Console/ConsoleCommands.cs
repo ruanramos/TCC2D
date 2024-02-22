@@ -1,6 +1,5 @@
 ﻿using Challenges;
 using QFSW.QC;
-using TMPro;
 using UnityEngine;
 
 namespace Console
@@ -43,7 +42,8 @@ namespace Console
         {
             foreach (var challenge in ChallengeNetwork.GetChallenges())
             {
-                Debug.Log($"Challenge between {challenge.Client1Id} and {challenge.Client2Id}");
+                var component = challenge.GetComponent<Challenge>();
+                Debug.Log($"Challenge between {component.Client1Id} and {component.Client2Id}");
             }
         }
 
@@ -52,9 +52,10 @@ namespace Console
         {
             foreach (var challenge in ChallengeNetwork.GetChallenges())
             {
-                if (challenge.Client1Id == clientId || challenge.Client2Id == clientId)
+                var component = challenge.GetComponent<Challenge>();
+                if (component.Client1Id == clientId || component.Client2Id == clientId)
                 {
-                    Debug.Log($"Challenge between {challenge.Client1Id} and {challenge.Client2Id}");
+                    Debug.Log($"Challenge between {component.Client1Id} and {component.Client2Id}");
                 }
             }
         }
