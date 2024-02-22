@@ -152,6 +152,7 @@ public class PlayerNetwork : NetworkBehaviour
                     _currentChallenge.GetComponent<NetworkObject>().Despawn();
                     print(
                         $"Despawned challenge network object for players {OwnerClientId} and {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
+                    _challengeOpponent.Value = 0;
                 }
             }
 
