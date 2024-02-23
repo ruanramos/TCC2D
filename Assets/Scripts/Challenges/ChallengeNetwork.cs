@@ -20,7 +20,7 @@ namespace Challenges
             if (!Input.GetKeyDown(KeyCode.F2)) return;
             foreach (var component in _challenges.Select(challenge => challenge.GetComponent<Challenge>()))
             {
-                Debug.Log($"Challenge between {component.Client1Id} and {component.Client2Id}");
+                Debug.Log($"Challenge between {component.Client1Id.Value} and {component.Client2Id.Value}");
             }
         }
 
@@ -44,8 +44,8 @@ namespace Challenges
         public static bool ChallengeExists(ulong client1Id, ulong client2Id)
         {
             return _challenges.Select(challenge => challenge.GetComponent<Challenge>()).Any(component =>
-                component.Client1Id == client1Id && component.Client2Id == client2Id ||
-                component.Client1Id == client2Id && component.Client2Id == client1Id);
+                component.Client1Id.Value == client1Id && component.Client2Id.Value == client2Id ||
+                component.Client1Id.Value == client2Id && component.Client2Id.Value == client1Id);
         }
 
         public static void RemoveChallenge(GameObject challenge)
@@ -56,8 +56,8 @@ namespace Challenges
         public static Challenge GetChallenge(ulong client1Id, ulong client2Id)
         {
             return _challenges.Select(challenge => challenge.GetComponent<Challenge>()).FirstOrDefault(component =>
-                component.Client1Id == client1Id && component.Client2Id == client2Id ||
-                component.Client1Id == client2Id && component.Client2Id == client1Id);
+                component.Client1Id.Value == client1Id && component.Client2Id.Value == client2Id ||
+                component.Client1Id.Value == client2Id && component.Client2Id.Value == client1Id);
         }
     }
 }
