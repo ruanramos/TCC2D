@@ -28,7 +28,6 @@ public static class GameConstants
         Simulation
     }
 
-
     // Layers
     public enum Layer
     {
@@ -48,7 +47,7 @@ public static class GameConstants
     // Debug
     public const bool DebugMode = true;
     public const int ChallengeSimulationTimeInSeconds = 10;
-    
+
     // Tags
     public const string PlayerTag = "Player";
     public const string CollectibleTag = "Collectible";
