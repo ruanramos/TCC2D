@@ -24,6 +24,23 @@ namespace Challenges
             }
         }
 
+        public static GameObject CreateAndSpawnChallenge(ulong client1, ulong client2)
+        {
+            var challengePrefab = Resources.Load<GameObject>("Prefabs/Challenge");
+            var instance = Instantiate(challengePrefab, Vector3.zero, Quaternion.identity);
+            AddNewChallenge(instance);
+            if (!instance.GetComponent<NetworkObject>().IsSpawned)
+            {
+                instance.GetComponent<NetworkObject>().Spawn();
+                instance.GetComponent<Challenge>().Client1Id.Value = client1;
+                instance.GetComponent<Challenge>().Client2Id.Value = client2;
+            }
+
+            print(
+                $"<color=#00FF00>Spawned challenge network object for players {client1} and {client2} at time {NetworkManager.Singleton.ServerTime.Time}</color>");
+            return instance;
+        }
+
         /*public static ulong CalculateFasterClient(Challenge challenge)
         {
             /*var client1Time = challenge.ClientFinishTimestamps[challenge.Client1Id];
