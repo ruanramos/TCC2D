@@ -53,7 +53,7 @@ namespace Console
             foreach (var challenge in ChallengeNetwork.GetChallenges())
             {
                 var component = challenge.GetComponent<Challenge>();
-                if (component.Client1Id == clientId || component.Client2Id == clientId)
+                if (component.Client1Id.Value == clientId || component.Client2Id.Value == clientId)
                 {
                     Debug.Log($"Challenge between {component.Client1Id} and {component.Client2Id}");
                 }
