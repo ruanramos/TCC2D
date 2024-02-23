@@ -48,6 +48,12 @@ namespace Challenges
                 component.Client1Id.Value == client2Id && component.Client2Id.Value == client1Id);
         }
 
+        public static Challenge IsInChallenge(ulong clientId)
+        {
+            return _challenges.Select(challenge => challenge.GetComponent<Challenge>()).FirstOrDefault(component =>
+                component.Client1Id.Value == clientId || component.Client2Id.Value == clientId);
+        }
+
         public static void RemoveChallenge(GameObject challenge)
         {
             _challenges.Remove(challenge);
