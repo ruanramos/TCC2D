@@ -49,6 +49,7 @@ namespace Challenges
                  Client2Id.Value != NetworkManager.LocalClient.ClientId) ||
                 _challengeHeader.text.Equals($"Player {Client1Id.Value} X Player {Client2Id.Value}")) return;
             _challengeOuterCanvas.SetActive(true);
+            _challengeInnerCanvas.SetActive(true);
             _challengeHeader.text = $"Player {Client1Id.Value} X Player {Client2Id.Value}";
         }
 
