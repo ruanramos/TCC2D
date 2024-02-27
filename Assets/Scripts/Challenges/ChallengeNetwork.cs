@@ -22,7 +22,7 @@ namespace Challenges
                 SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
                     Input.inputString);
             }
-            
+
             // Print challenges happening on command
             if (!Input.GetKeyDown(KeyCode.F2)) return;
             foreach (var component in _challenges.Select(challenge => challenge.GetComponent<Challenge>()))
@@ -54,8 +54,8 @@ namespace Challenges
             var client2Time = challenge.ClientFinishTimestamps[challenge.Client2Id];#1#
             //return client1Time < client2Time ? challenge.Client1Id : challenge.Client2Id;
         }*/
-        
-        [ServerRpc (RequireOwnership = false)]
+
+        [ServerRpc(RequireOwnership = false)]
         private void SendKeyboardTimestampToServerServerRpc(double time, string key)
         {
             print(
@@ -63,7 +63,7 @@ namespace Challenges
                 $"timestamp: {time}  --- Server time: {NetworkManager.Singleton.ServerTime.Time}");
             print($"Will change _challengeData to add timestamp for client {OwnerClientId}");
         }
-        
+
         public static IEnumerator SimulateChallenge(GameObject player1, GameObject player2)
         {
             var player1NetworkBehaviour = player1.GetComponent<NetworkBehaviour>();
@@ -73,7 +73,7 @@ namespace Challenges
             var player1Id = player1NetworkBehaviour.OwnerClientId;
             var player2Id = player2NetworkBehaviour.OwnerClientId;
 
-            yield return new WaitForSeconds(GameConstants.ChallengeSimulationTimeInSeconds);
+            yield return new WaitForSeconds(ChallengeSimulationTimeInSeconds);
 
             var winner = Random.Range(0, 2) == 0
                 ? player1
@@ -90,10 +90,10 @@ namespace Challenges
             print(
                 $"Finishing challenge simulation between players {player1Id}" +
                 $" and {player2Id}. Player {winnerId} wins");
-            loser.gameObject.GetComponent<PlayerNetwork>().RemoveLivesServerRpc(1);
-            if (winner.gameObject.GetComponent<PlayerNetwork>().GetLives() < GameConstants.MaxLives)
+            loser.gameObject.GetComponent<PlayerNetwork>().RemoveLives(1);
+            if (winner.gameObject.GetComponent<PlayerNetwork>().GetLives() < MaxLives)
             {
-                winner.gameObject.GetComponent<PlayerNetwork>().AddLivesServerRpc(1);
+                winner.gameObject.GetComponent<PlayerNetwork>().AddLives(1);
                 yield break;
             }
 

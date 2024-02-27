@@ -21,7 +21,7 @@ namespace Console
             foreach (var playerNetwork in Object.FindObjectsOfType<PlayerNetwork>())
             {
                 if (playerNetwork.OwnerClientId != clientId) continue;
-                playerNetwork.AddLivesServerRpc(n);
+                playerNetwork.AddLives(n);
                 break;
             }
         }
@@ -32,7 +32,7 @@ namespace Console
             foreach (var playerNetwork in Object.FindObjectsOfType<PlayerNetwork>())
             {
                 if (playerNetwork.OwnerClientId != clientId) continue;
-                playerNetwork.RemoveLivesServerRpc(n);
+                playerNetwork.RemoveLives(n);
                 break;
             }
         }

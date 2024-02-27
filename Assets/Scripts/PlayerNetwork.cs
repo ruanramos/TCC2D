@@ -234,15 +234,13 @@ public class PlayerNetwork : NetworkBehaviour
         _playerLabelText.text = $"Player: {OwnerClientId} \nLives: {_lives.Value}";
     }
 
-    [ServerRpc]
-    public void AddLivesServerRpc(int n)
+    public void AddLives(int n)
     {
         print("DDDDD");
         _lives.Value += n;
     }
 
-    [ServerRpc]
-    public void RemoveLivesServerRpc(int n)
+    public void RemoveLives(int n)
     {
         print("CCCCCC");
         _lives.Value -= n;
@@ -267,13 +265,11 @@ public class PlayerNetwork : NetworkBehaviour
     [ServerRpc]
     public void SetIsInChallengeServerRpc(bool value)
     {
-        print("BBBBBBB");
         _isInChallenge.Value = value;
     }
-    
+
     public void SetIsInChallenge(bool value)
     {
-        print("FFFFFFFFF");
         _isInChallenge.Value = value;
     }
 
