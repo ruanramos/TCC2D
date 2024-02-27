@@ -107,7 +107,7 @@ public class PlayerNetwork : NetworkBehaviour
                 print(
                     $"Changed {OwnerClientId} challenge opponent value to {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
                 _isInChallenge.Value = true;
-                StartCoroutine(SimulateChallenge(gameObject, other.gameObject));
+                StartCoroutine(ChallengeNetwork.SimulateChallenge(gameObject, other.gameObject));
                 break;
         }
     }
@@ -273,12 +273,14 @@ public class PlayerNetwork : NetworkBehaviour
     [ServerRpc]
     public void AddLivesServerRpc(int n)
     {
+        print("DDDDD");
         _lives.Value += n;
     }
 
     [ServerRpc]
     public void RemoveLivesServerRpc(int n)
     {
+        print("CCCCCC");
         _lives.Value -= n;
     }
 
@@ -288,8 +290,7 @@ public class PlayerNetwork : NetworkBehaviour
         _score.Value += n;
     }
 
-    [ServerRpc]
-    public void RemoveScoreServerRpc(int n)
+    public void RemoveScore(int n)
     {
         _score.Value -= n;
     }
@@ -299,9 +300,26 @@ public class PlayerNetwork : NetworkBehaviour
         return _isInChallenge.Value;
     }
 
-    public bool SetIsInChallenge(bool value)
+    [ServerRpc]
+    public void SetIsInChallengeServerRpc(bool value)
     {
+        print("BBBBBBB");
         _isInChallenge.Value = value;
-        return _isInChallenge.Value;
+    }
+    
+    public void SetIsInChallenge(bool value)
+    {
+        print("FFFFFFFFF");
+        _isInChallenge.Value = value;
+    }
+
+    public int GetLives()
+    {
+        return _lives.Value;
+    }
+
+    public void SetLives(int value)
+    {
+        _lives.Value = value;
     }
 }
