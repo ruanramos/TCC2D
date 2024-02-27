@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
@@ -16,6 +17,12 @@ namespace Challenges
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Space) && NetworkManager.LocalClient != null)
+            {
+                SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
+                    Input.inputString);
+            }
+            
             // Print challenges happening on command
             if (!Input.GetKeyDown(KeyCode.F2)) return;
             foreach (var component in _challenges.Select(challenge => challenge.GetComponent<Challenge>()))
@@ -47,6 +54,51 @@ namespace Challenges
             var client2Time = challenge.ClientFinishTimestamps[challenge.Client2Id];#1#
             //return client1Time < client2Time ? challenge.Client1Id : challenge.Client2Id;
         }*/
+        
+        [ServerRpc (RequireOwnership = false)]
+        private void SendKeyboardTimestampToServerServerRpc(double time, string key)
+        {
+            print(
+                $"Received {key} press from client {OwnerClientId}\n" +
+                $"timestamp: {time}  --- Server time: {NetworkManager.Singleton.ServerTime.Time}");
+            print($"Will change _challengeData to add timestamp for client {OwnerClientId}");
+        }
+        
+        public static IEnumerator SimulateChallenge(GameObject player1, GameObject player2)
+        {
+            var player1NetworkBehaviour = player1.GetComponent<NetworkBehaviour>();
+            var player2NetworkBehaviour = player2.GetComponent<NetworkBehaviour>();
+            var player1Network = player1.GetComponent<PlayerNetwork>();
+            var player2Network = player2.GetComponent<PlayerNetwork>();
+            var player1Id = player1NetworkBehaviour.OwnerClientId;
+            var player2Id = player2NetworkBehaviour.OwnerClientId;
+
+            yield return new WaitForSeconds(GameConstants.ChallengeSimulationTimeInSeconds);
+
+            var winner = Random.Range(0, 2) == 0
+                ? player1
+                : player2;
+            var loser = winner == player2
+                ? player1
+                : player2;
+
+            player1Network.SetIsInChallenge(false);
+            player2Network.SetIsInChallenge(false);
+
+            var loserId = loser.GetComponent<NetworkBehaviour>().OwnerClientId;
+            var winnerId = winner.GetComponent<NetworkBehaviour>().OwnerClientId;
+            print(
+                $"Finishing challenge simulation between players {player1Id}" +
+                $" and {player2Id}. Player {winnerId} wins");
+            loser.gameObject.GetComponent<PlayerNetwork>().RemoveLivesServerRpc(1);
+            if (winner.gameObject.GetComponent<PlayerNetwork>().GetLives() < GameConstants.MaxLives)
+            {
+                winner.gameObject.GetComponent<PlayerNetwork>().AddLivesServerRpc(1);
+                yield break;
+            }
+
+            print($"Could not increment player {winnerId} lives because it is already at max lives");
+        }
 
         public static HashSet<GameObject> GetChallenges()
         {
