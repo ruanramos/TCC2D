@@ -228,42 +228,6 @@ public class PlayerNetwork : NetworkBehaviour
         UpdatePlayerLabel();
     }
 
-    private IEnumerator SimulateChallenge(GameObject player1, GameObject player2)
-    {
-        var player1NetworkBehaviour = player1.GetComponent<NetworkBehaviour>();
-        var player2NetworkBehaviour = player2.GetComponent<NetworkBehaviour>();
-        var player1Network = player1.GetComponent<PlayerNetwork>();
-        var player2Network = player2.GetComponent<PlayerNetwork>();
-        var player1Id = player1NetworkBehaviour.OwnerClientId;
-        var player2Id = player2NetworkBehaviour.OwnerClientId;
-
-        yield return new WaitForSeconds(ChallengeSimulationTimeInSeconds);
-
-        var winner = Random.Range(0, 2) == 0
-            ? player1
-            : player2;
-        var loser = winner == player2
-            ? player1
-            : player2;
-
-        player1Network._isInChallenge.Value = false;
-        player2Network._isInChallenge.Value = false;
-
-        var loserId = loser.GetComponent<NetworkBehaviour>().OwnerClientId;
-        var winnerId = winner.GetComponent<NetworkBehaviour>().OwnerClientId;
-        print(
-            $"Finishing challenge simulation between players {player1Id}" +
-            $" and {player2Id}. Player {winnerId} wins");
-        loser.gameObject.GetComponent<PlayerNetwork>()._lives.Value -= 1;
-        if (winner.gameObject.GetComponent<PlayerNetwork>()._lives.Value < MaxLives)
-        {
-            winner.gameObject.GetComponent<PlayerNetwork>()._lives.Value += 1;
-            yield break;
-        }
-
-        print($"Could not increment player {winnerId} lives because it is already at max lives");
-    }
-
     private void UpdatePlayerLabel()
     {
         print($"Updating player {OwnerClientId} label");
