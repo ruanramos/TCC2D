@@ -12,14 +12,17 @@ namespace Challenges
 
         private TextMeshProUGUI _challengeHeader;
         private GameObject _challengeOuterCanvas;
+        private GameObject _challengeInnerCanvas;
 
         private void Awake()
         {
             print(
                 $"<color=#FFFF00>Challenge awake at time {NetworkManager.Singleton.ServerTime.Time}</color>");
             _challengeOuterCanvas = transform.GetChild(0).gameObject;
+            _challengeInnerCanvas = transform.GetChild(1).gameObject;
             _challengeHeader = _challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>();
             _challengeOuterCanvas.SetActive(false);
+            _challengeInnerCanvas.SetActive(false);
         }
 
         private void Start()
@@ -34,17 +37,12 @@ namespace Challenges
                  Client2Id.Value == NetworkManager.LocalClient.ClientId))
             {
                 _challengeOuterCanvas.SetActive(true);
+                _challengeInnerCanvas.SetActive(true);
             }
         }
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Space) && IsOwner)
-            {
-                SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
-                    Input.inputString);
-            }
-            
             // Check if client running this is involved in challenge
             if ((Client1Id.Value == 0 && Client2Id.Value == 0) ||
                 (Client1Id.Value != NetworkManager.LocalClient.ClientId &&
@@ -52,15 +50,6 @@ namespace Challenges
                 _challengeHeader.text.Equals($"Player {Client1Id.Value} X Player {Client2Id.Value}")) return;
             _challengeOuterCanvas.SetActive(true);
             _challengeHeader.text = $"Player {Client1Id.Value} X Player {Client2Id.Value}";
-        }
-
-        [ServerRpc]
-        private void SendKeyboardTimestampToServerServerRpc(double time, string key)
-        {
-            print(
-                $"Received {key} press from client {OwnerClientId}\n" +
-                $"timestamp: {time}  --- Server time: {NetworkManager.Singleton.ServerTime.Time}");
-            print($"Will change _challengeData to add timestamp for client {OwnerClientId}");
         }
 
         public override void OnNetworkSpawn()
