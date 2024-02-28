@@ -237,13 +237,11 @@ public class PlayerNetwork : NetworkBehaviour
 
     public void AddLives(int n)
     {
-        print("DDDDD");
         _lives.Value += n;
     }
 
     public void RemoveLives(int n)
     {
-        print("CCCCCC");
         _lives.Value -= n;
     }
 
