@@ -62,7 +62,6 @@ namespace Challenges
             print(
                 $"Received {key} press from client {OwnerClientId}\n" +
                 $"timestamp: {time}  --- Server time: {NetworkManager.Singleton.ServerTime.Time}");
-            print($"Will change _challengeData to add timestamp for client {OwnerClientId}");
         }
 
         public static IEnumerator SimulateChallenge(GameObject player1, GameObject player2)
