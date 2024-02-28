@@ -67,6 +67,9 @@ namespace Challenges
 
         public static IEnumerator SimulateChallenge(GameObject player1, GameObject player2)
         {
+            // Check if simulation already exists
+            
+            
             var player1NetworkBehaviour = player1.GetComponent<NetworkBehaviour>();
             var player2NetworkBehaviour = player2.GetComponent<NetworkBehaviour>();
             var player1Network = player1.GetComponent<PlayerNetwork>();

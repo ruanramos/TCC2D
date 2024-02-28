@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using Challenges;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Components;
@@ -107,7 +106,6 @@ public class PlayerNetwork : NetworkBehaviour
                 print(
                     $"Changed {OwnerClientId} challenge opponent value to {_challengeOpponent.Value} at time {NetworkManager.Singleton.ServerTime.Time}");
                 _isInChallenge.Value = true;
-                StartCoroutine(ChallengeNetwork.SimulateChallenge(gameObject, other.gameObject));
                 break;
         }
     }
@@ -171,6 +169,9 @@ public class PlayerNetwork : NetworkBehaviour
         {
             // Server will create challenge object and spawn
             _currentChallenge = CreateAndSpawnChallenge(OwnerClientId, _challengeOpponent.Value);
+            // Start challenge simulation against opponent gameobject by finding the gameobject given the client id
+            StartCoroutine(SimulateChallenge(gameObject,
+                NetworkManager.Singleton.ConnectedClients[_challengeOpponent.Value].PlayerObject.gameObject));
         }
 
         StartCoroutine(_visuals.MakePlayerTransparentWhileInChallenge());
