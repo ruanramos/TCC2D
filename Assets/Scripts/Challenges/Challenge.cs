@@ -43,11 +43,22 @@ namespace Challenges
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Space) &&
+                (Client1Id.Value == NetworkManager.LocalClient.ClientId ||
+                 Client2Id.Value == NetworkManager.LocalClient.ClientId))
+            {
+                SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
+                    Input.inputString);
+            }
+            
             // Check if client running this is involved in challenge
+            // If so, show challenge canvas
             if ((Client1Id.Value == 0 && Client2Id.Value == 0) ||
                 (Client1Id.Value != NetworkManager.LocalClient.ClientId &&
                  Client2Id.Value != NetworkManager.LocalClient.ClientId) ||
                 _challengeHeader.text.Equals($"Player {Client1Id.Value} X Player {Client2Id.Value}")) return;
+
+            // If client is involved in challenge, show canvas
             _challengeOuterCanvas.SetActive(true);
             _challengeInnerCanvas.SetActive(true);
             _challengeHeader.text = $"Player {Client1Id.Value} X Player {Client2Id.Value}";
@@ -90,6 +101,14 @@ namespace Challenges
         {
             var result = $"{Client1Id.Value} x {Client2Id.Value}: ";
             return result;
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void SendKeyboardTimestampToServerServerRpc(double time, string key)
+        {
+            print(
+                $"Received {key} press from client {NetworkManager.Singleton.LocalClient}\n" +
+                $"timestamp: {time}  --- Server time: {NetworkManager.Singleton.ServerTime.Time}");
         }
     }
 }

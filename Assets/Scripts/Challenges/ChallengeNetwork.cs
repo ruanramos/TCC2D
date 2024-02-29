@@ -18,12 +18,6 @@ namespace Challenges
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Space) && NetworkManager.LocalClient != null)
-            {
-                SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
-                    Input.inputString);
-            }
-
             // Print challenges happening on command
             if (!Input.GetKeyDown(KeyCode.F2)) return;
             foreach (var component in _challenges.Select(challenge => challenge.GetComponent<Challenge>()))
@@ -56,19 +50,10 @@ namespace Challenges
             //return client1Time < client2Time ? challenge.Client1Id : challenge.Client2Id;
         }*/
 
-        [ServerRpc(RequireOwnership = false)]
-        private void SendKeyboardTimestampToServerServerRpc(double time, string key)
-        {
-            print(
-                $"Received {key} press from client {OwnerClientId}\n" +
-                $"timestamp: {time}  --- Server time: {NetworkManager.Singleton.ServerTime.Time}");
-        }
-
         public static IEnumerator SimulateChallenge(GameObject player1, GameObject player2)
         {
             // Check if simulation already exists
-            
-            
+
             var player1NetworkBehaviour = player1.GetComponent<NetworkBehaviour>();
             var player2NetworkBehaviour = player2.GetComponent<NetworkBehaviour>();
             var player1Network = player1.GetComponent<PlayerNetwork>();
