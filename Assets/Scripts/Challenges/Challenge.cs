@@ -50,7 +50,7 @@ namespace Challenges
                 SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
                     Input.inputString);
             }
-            
+
             // Check if client running this is involved in challenge
             // If so, show challenge canvas
             if ((Client1Id.Value == 0 && Client2Id.Value == 0) ||
@@ -66,28 +66,12 @@ namespace Challenges
 
         public override void OnNetworkSpawn()
         {
-            print("Challenge spawned");
-            Client1Id.OnValueChanged += TreatClient1IdChanged;
-            Client2Id.OnValueChanged += TreatClient2IdChanged;
-        }
-
-        private void TreatClient1IdChanged(ulong previousId, ulong currentId)
-        {
-            print(
-                $"<color=#FFFF00>Changed client 1 id from {previousId} to {currentId} at time {NetworkManager.Singleton.ServerTime.Time}</color>");
-        }
-
-        private void TreatClient2IdChanged(ulong previousId, ulong currentId)
-        {
-            print(
-                $"<color=#FFFF00>Changed client 2 id from {previousId} to {currentId} at time {NetworkManager.Singleton.ServerTime.Time}</color>");
+            base.OnNetworkSpawn();
         }
 
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-            Client1Id.OnValueChanged -= TreatClient1IdChanged;
-            Client2Id.OnValueChanged -= TreatClient2IdChanged;
             Destroy(gameObject);
         }
 
