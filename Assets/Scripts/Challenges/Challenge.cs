@@ -33,7 +33,9 @@ namespace Challenges
             print(
                 $"<color=#FFFF00>Challenge start at time {NetworkManager.Singleton.ServerTime.Time}</color>");
             print($"Client1Id: {Client1Id.Value} Client2Id: {Client2Id.Value}");
-            _challengeHeader.text = $"Player {Client1Id.Value} X Player {Client2Id.Value}";
+            _challengeHeader.text = Client1Id.Value == NetworkManager.LocalClient.ClientId
+                ? $"Player {Client1Id.Value} X Player {Client2Id.Value}"
+                : $"Player {Client2Id.Value} X Player {Client1Id.Value}";
             print(
                 $"<color=#FF0000>C1: {Client1Id.Value} - C2: {Client2Id.Value} - Owner: {OwnerClientId} - Localclient: {NetworkManager.LocalClient.ClientId}</color>");
             if ((Client1Id.Value == NetworkManager.LocalClient.ClientId ||
@@ -55,16 +57,19 @@ namespace Challenges
             }
 
             // Check if client running this is involved in challenge
-            // If so, show challenge canvas
             if ((Client1Id.Value == 0 && Client2Id.Value == 0) ||
                 (Client1Id.Value != NetworkManager.LocalClient.ClientId &&
                  Client2Id.Value != NetworkManager.LocalClient.ClientId) ||
-                _challengeHeader.text.Equals($"Player {Client1Id.Value} X Player {Client2Id.Value}")) return;
+                _challengeHeader.text.Equals($"Player {Client1Id.Value} X Player {Client2Id.Value}") ||
+                _challengeHeader.text.Equals($"Player {Client2Id.Value} X Player {Client1Id.Value}")) return;
 
             // If client is involved in challenge, show canvas
             _challengeOuterCanvas.SetActive(true);
             _challengeInnerCanvas.SetActive(true);
-            _challengeHeader.text = $"Player {Client1Id.Value} X Player {Client2Id.Value}";
+            // Make local client name appear first in challenge header
+            _challengeHeader.text = Client1Id.Value == NetworkManager.LocalClient.ClientId
+                ? $"Player {Client1Id.Value} X Player {Client2Id.Value}"
+                : $"Player {Client2Id.Value} X Player {Client1Id.Value}";
         }
 
         public override void OnNetworkSpawn()
