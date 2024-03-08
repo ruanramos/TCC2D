@@ -71,6 +71,19 @@ namespace Challenges
             player1Network.SetIsInChallenge(false);
             player2Network.SetIsInChallenge(false);
 
+            if (winnerId == 0)
+            {
+                print(
+                    $"Finishing challenge simulation between players {player1Id}" +
+                    $" and {player2Id}. No winner");
+                
+                // Both players lose a health
+                player1Network.RemoveLives(1);
+                player2Network.RemoveLives(1);
+                print($"Player {player1Id} and {player2Id} lost a life");
+                
+                yield break;
+            }
 
             var loser = NetworkManager.Singleton.ConnectedClients[loserId].PlayerObject.gameObject;
             var winner = NetworkManager.Singleton.ConnectedClients[winnerId].PlayerObject.gameObject;
