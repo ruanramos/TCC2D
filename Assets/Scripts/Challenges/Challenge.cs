@@ -74,12 +74,6 @@ namespace Challenges
 
         public override void OnNetworkDespawn()
         {
-            /*/ print the timestamps for each client
-            foreach (var (key, value) in _clientFinishTimestamps)
-            {
-                print($"Client {key} finished at {value}");
-            }*/
-
             base.OnNetworkDespawn();
             Destroy(gameObject);
         }
@@ -103,7 +97,7 @@ namespace Challenges
                         {
                             print($"Client {clientId} didn't finish the challenge");
                         }
-                        
+
                         // Set timestamp to ulong.MaxValue if client didn't finish challenge
                         _clientFinishTimestamps[clientId] = ulong.MaxValue;
                     }
