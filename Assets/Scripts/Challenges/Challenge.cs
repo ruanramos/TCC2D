@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -9,6 +10,8 @@ namespace Challenges
     {
         public NetworkVariable<ulong> Client1Id { get; set; } = new();
         public NetworkVariable<ulong> Client2Id { get; set; } = new();
+
+        private Dictionary<ulong, double> _clientFinishTimestamps = new();
 
         private TextMeshProUGUI _challengeHeader;
         private GameObject _challengeOuterCanvas;
@@ -88,11 +91,17 @@ namespace Challenges
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void SendKeyboardTimestampToServerServerRpc(double time, string key)
+        private void SendKeyboardTimestampToServerServerRpc(double time, string key,
+            ServerRpcParams serverRpcParams = default)
         {
+            var clientId = serverRpcParams.Receive.SenderClientId;
+
             print(
-                $"Received {key} press from client {NetworkManager.Singleton.LocalClient}\n" +
+                $"Received {key} press from client {clientId}\n" +
                 $"timestamp: {time}  --- Server time: {NetworkManager.Singleton.ServerTime.Time}");
+
+            // Store timestamp of key press on server if it's not already stored
+            _clientFinishTimestamps.TryAdd(clientId, time);
         }
     }
 }
