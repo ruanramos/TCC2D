@@ -79,17 +79,44 @@ namespace Challenges
             {
                 print($"Client {key} finished at {value}");
             }*/
-            
+
             base.OnNetworkDespawn();
             Destroy(gameObject);
         }
 
         public ulong DecideWinner()
         {
+            switch (_clientFinishTimestamps.Count)
+            {
+                // Check if any player pressed space
+                case 0:
+                    print("No player finished the challenge");
+                    return 0;
+
+                // Check if both players pressed space
+                case < 2:
+                {
+                    // Print what player didn't finish the challenge
+                    foreach (var clientId in new[] { Client1Id.Value, Client2Id.Value })
+                    {
+                        if (!_clientFinishTimestamps.ContainsKey(clientId))
+                        {
+                            print($"Client {clientId} didn't finish the challenge");
+                        }
+                        
+                        // Set timestamp to ulong.MaxValue if client didn't finish challenge
+                        _clientFinishTimestamps[clientId] = ulong.MaxValue;
+                    }
+
+                    break;
+                }
+            }
+
             var winner = _clientFinishTimestamps[Client1Id.Value] < _clientFinishTimestamps[Client2Id.Value]
                 ? Client1Id.Value
                 : Client2Id.Value;
-            print($"<color=#FF00AA>Winner of challenge between {Client1Id.Value} and {Client2Id.Value} is {winner}</color>");
+            print(
+                $"<color=#FF00AA>Winner of challenge between {Client1Id.Value} and {Client2Id.Value} is {winner}</color>");
             return winner;
         }
 
