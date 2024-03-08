@@ -170,7 +170,7 @@ public class PlayerNetwork : NetworkBehaviour
             // Server will create challenge object and spawn
             _currentChallenge = CreateAndSpawnChallenge(OwnerClientId, _challengeOpponent.Value);
             // Start challenge simulation against opponent gameobject by finding the gameobject given the client id
-            StartCoroutine(SimulateChallenge(gameObject,
+            StartCoroutine(SimulateChallenge(_currentChallenge, gameObject,
                 NetworkManager.Singleton.ConnectedClients[_challengeOpponent.Value].PlayerObject.gameObject));
         }
 

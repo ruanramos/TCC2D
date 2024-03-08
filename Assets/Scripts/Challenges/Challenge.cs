@@ -74,8 +74,23 @@ namespace Challenges
 
         public override void OnNetworkDespawn()
         {
+            /*/ print the timestamps for each client
+            foreach (var (key, value) in _clientFinishTimestamps)
+            {
+                print($"Client {key} finished at {value}");
+            }*/
+            
             base.OnNetworkDespawn();
             Destroy(gameObject);
+        }
+
+        public ulong DecideWinner()
+        {
+            var winner = _clientFinishTimestamps[Client1Id.Value] < _clientFinishTimestamps[Client2Id.Value]
+                ? Client1Id.Value
+                : Client2Id.Value;
+            print($"<color=#FF00AA>Winner of challenge between {Client1Id.Value} and {Client2Id.Value} is {winner}</color>");
+            return winner;
         }
 
         public bool Equals(Challenge other)

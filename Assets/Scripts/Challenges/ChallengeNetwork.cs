@@ -50,7 +50,7 @@ namespace Challenges
             //return client1Time < client2Time ? challenge.Client1Id : challenge.Client2Id;
         }*/
 
-        public static IEnumerator SimulateChallenge(GameObject player1, GameObject player2)
+        public static IEnumerator SimulateChallenge(GameObject challenge, GameObject player1, GameObject player2)
         {
             var player1NetworkBehaviour = player1.GetComponent<NetworkBehaviour>();
             var player2NetworkBehaviour = player2.GetComponent<NetworkBehaviour>();
@@ -59,20 +59,22 @@ namespace Challenges
             var player1Id = player1NetworkBehaviour.OwnerClientId;
             var player2Id = player2NetworkBehaviour.OwnerClientId;
 
+            var challengeComponent = challenge.GetComponent<Challenge>();
+
             yield return new WaitForSeconds(ChallengeSimulationTimeInSeconds);
 
-            var winner = Random.Range(0, 2) == 0
-                ? player1
-                : player2;
-            var loser = winner == player2
-                ? player1
-                : player2;
+            var winnerId = challengeComponent.DecideWinner();
+            var loserId = winnerId == player2Id
+                ? player1Id
+                : player2Id;
 
             player1Network.SetIsInChallenge(false);
             player2Network.SetIsInChallenge(false);
 
-            var loserId = loser.GetComponent<NetworkBehaviour>().OwnerClientId;
-            var winnerId = winner.GetComponent<NetworkBehaviour>().OwnerClientId;
+
+            var loser = NetworkManager.Singleton.ConnectedClients[loserId].PlayerObject.gameObject;
+            var winner = NetworkManager.Singleton.ConnectedClients[winnerId].PlayerObject.gameObject;
+
             print(
                 $"Finishing challenge simulation between players {player1Id}" +
                 $" and {player2Id}. Player {winnerId} wins");
