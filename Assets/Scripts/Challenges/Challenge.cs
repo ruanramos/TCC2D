@@ -17,7 +17,7 @@ namespace Challenges
         private GameObject _challengeOuterCanvas;
         private GameObject _challengeInnerCanvas;
         private GameObject _challengeTimeout;
-        
+
         private double _challengeStartTime;
 
         private void Awake()
@@ -26,7 +26,7 @@ namespace Challenges
                 $"<color=#FFFF00>Challenge awake at time {NetworkManager.Singleton.ServerTime.Time}</color>");
             _challengeOuterCanvas = transform.GetChild(0).gameObject;
             _challengeInnerCanvas = transform.GetChild(1).gameObject;
-            _challengeTimeout = transform.GetChild(2).gameObject;
+            _challengeTimeout = _challengeOuterCanvas.transform.GetChild(2).gameObject;
             _challengeHeader = _challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>();
             _challengeOuterCanvas.SetActive(false);
             _challengeInnerCanvas.SetActive(false);
@@ -49,6 +49,7 @@ namespace Challenges
             {
                 _challengeOuterCanvas.SetActive(true);
                 _challengeInnerCanvas.SetActive(true);
+                _challengeTimeout.SetActive(true);
             }
         }
 
@@ -62,6 +63,9 @@ namespace Challenges
                     Input.inputString);
             }
 
+            _challengeTimeout.GetComponent<TextMeshProUGUI>().text =
+                $"{Math.Round(GameConstants.ChallengeSimulationTimeInSeconds - (NetworkManager.Singleton.ServerTime.Time - _challengeStartTime), 2)}";
+
             // Check if client running this is involved in challenge
             if ((Client1Id.Value == 0 && Client2Id.Value == 0) ||
                 (Client1Id.Value != NetworkManager.LocalClient.ClientId &&
@@ -72,6 +76,7 @@ namespace Challenges
             // If client is involved in challenge, show canvas
             _challengeOuterCanvas.SetActive(true);
             _challengeInnerCanvas.SetActive(true);
+            _challengeTimeout.SetActive(true);
             // Make local client name appear first in challenge header
             _challengeHeader.text = Client1Id.Value == NetworkManager.LocalClient.ClientId
                 ? $"Player {Client1Id.Value} X Player {Client2Id.Value}"
@@ -95,7 +100,8 @@ namespace Challenges
             {
                 // Check if any player pressed space
                 case 0:
-                    print("No player finished the challenge");
+                    print(
+                        $"<color=#FF00AA>Challenge between {Client1Id.Value} and {Client2Id.Value} had no winner</color>");
                     return 0;
 
                 // Check if both players pressed space
@@ -106,11 +112,11 @@ namespace Challenges
                     {
                         if (!_clientFinishTimestamps.ContainsKey(clientId))
                         {
-                            print($"Client {clientId} didn't finish the challenge");
+                            print(
+                                $"<color=#FF00AA>{clientId} didn't finish the challenge</color>");
+                            // Set timestamp to ulong.MaxValue if client didn't finish challenge
+                            _clientFinishTimestamps[clientId] = ulong.MaxValue;
                         }
-
-                        // Set timestamp to ulong.MaxValue if client didn't finish challenge
-                        _clientFinishTimestamps[clientId] = ulong.MaxValue;
                     }
 
                     break;
