@@ -17,6 +17,7 @@ namespace Challenges
         private GameObject _challengeOuterCanvas;
         private GameObject _challengeInnerCanvas;
         private GameObject _challengeTimeout;
+        private GameObject _challengeWinner;
 
         private double _challengeStartTime;
 
@@ -27,10 +28,12 @@ namespace Challenges
             _challengeOuterCanvas = transform.GetChild(0).gameObject;
             _challengeInnerCanvas = transform.GetChild(1).gameObject;
             _challengeTimeout = _challengeOuterCanvas.transform.GetChild(2).gameObject;
+            _challengeWinner = _challengeOuterCanvas.transform.GetChild(3).gameObject;
             _challengeHeader = _challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>();
             _challengeOuterCanvas.SetActive(false);
             _challengeInnerCanvas.SetActive(false);
             _challengeTimeout.SetActive(false);
+            _challengeWinner.SetActive(false);
         }
 
         private void Start()
@@ -63,8 +66,12 @@ namespace Challenges
                     Input.inputString);
             }
 
+            var timeoutCounter = GameConstants.ChallengeSimulationTimeInSeconds -
+                                 (NetworkManager.Singleton.ServerTime.Time - _challengeStartTime);
+            var timeoutText = timeoutCounter < 0 ? 0 : timeoutCounter;
+
             _challengeTimeout.GetComponent<TextMeshProUGUI>().text =
-                $"{Math.Round(GameConstants.ChallengeSimulationTimeInSeconds - (NetworkManager.Singleton.ServerTime.Time - _challengeStartTime), 2)}";
+                $"{Math.Round(timeoutText, 2)}";
 
             // Check if client running this is involved in challenge
             if ((Client1Id.Value == 0 && Client2Id.Value == 0) ||
@@ -77,6 +84,7 @@ namespace Challenges
             _challengeOuterCanvas.SetActive(true);
             _challengeInnerCanvas.SetActive(true);
             _challengeTimeout.SetActive(true);
+
             // Make local client name appear first in challenge header
             _challengeHeader.text = Client1Id.Value == NetworkManager.LocalClient.ClientId
                 ? $"Player {Client1Id.Value} X Player {Client2Id.Value}"
@@ -155,6 +163,24 @@ namespace Challenges
 
             // Store timestamp of key press on server if it's not already stored
             _clientFinishTimestamps.TryAdd(clientId, time);
+        }
+
+        [Rpc(SendTo.Server)]
+        public void SetWinnerTextServerRpc(ulong client1Id, ulong client2Id, ulong winnerId,
+            RpcParams rpcParams = default)
+        {
+            SetWinnerTextClientRpc(winnerId, RpcTarget.Group(new[] { client1Id, client2Id }, RpcTargetUse.Temp));
+        }
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        private void SetWinnerTextClientRpc(ulong winnerId, RpcParams rpcParams = default)
+        {
+            _challengeWinner.SetActive(true);
+            print(
+                $"<color=#FF00AA>Setting winner text for challenge between {Client1Id.Value} and {Client2Id.Value}</color>");
+            _challengeWinner.GetComponent<TextMeshProUGUI>().text = winnerId == 0
+                ? "No winner"
+                : $"Player {winnerId} wins";
         }
     }
 }

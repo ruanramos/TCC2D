@@ -68,6 +68,11 @@ namespace Challenges
                 ? player1Id
                 : player2Id;
 
+            // Set text to show winner
+            challengeComponent.SetWinnerTextServerRpc(player1Id, player2Id, winnerId);
+
+            yield return new WaitForSeconds(ChallengeWinnerTime);
+
             player1Network.SetIsInChallenge(false);
             player2Network.SetIsInChallenge(false);
 
@@ -76,12 +81,12 @@ namespace Challenges
                 print(
                     $"Finishing challenge simulation between players {player1Id}" +
                     $" and {player2Id}. No winner");
-                
+
                 // Both players lose a health
                 player1Network.RemoveLives(1);
                 player2Network.RemoveLives(1);
                 print($"Player {player1Id} and {player2Id} lost a life");
-                
+
                 yield break;
             }
 
