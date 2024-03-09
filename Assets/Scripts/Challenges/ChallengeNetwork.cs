@@ -43,13 +43,6 @@ namespace Challenges
             return instance;
         }
 
-        /*public static ulong CalculateFasterClient(Challenge challenge)
-        {
-            /*var client1Time = challenge.ClientFinishTimestamps[challenge.Client1Id];
-            var client2Time = challenge.ClientFinishTimestamps[challenge.Client2Id];#1#
-            //return client1Time < client2Time ? challenge.Client1Id : challenge.Client2Id;
-        }*/
-
         public static IEnumerator SimulateChallenge(GameObject challenge, GameObject player1, GameObject player2)
         {
             var player1NetworkBehaviour = player1.GetComponent<NetworkBehaviour>();
