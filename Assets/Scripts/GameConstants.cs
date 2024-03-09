@@ -20,6 +20,8 @@ public static class GameConstants
     public const float PostChallengeInvincibilityTimeInSeconds = 3f;
     public const float PostChallengeSpeedMultiplier = 2f;
     public const float PlayerAlphaWhileInChallenge = 0.4f;
+    public const float ChallengeWinnerTime = 3f;
+    
 
     public enum ChallengeType
     {
