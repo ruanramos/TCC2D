@@ -16,6 +16,9 @@ namespace Challenges
         private TextMeshProUGUI _challengeHeader;
         private GameObject _challengeOuterCanvas;
         private GameObject _challengeInnerCanvas;
+        private GameObject _challengeTimeout;
+        
+        private double _challengeStartTime;
 
         private void Awake()
         {
@@ -23,13 +26,16 @@ namespace Challenges
                 $"<color=#FFFF00>Challenge awake at time {NetworkManager.Singleton.ServerTime.Time}</color>");
             _challengeOuterCanvas = transform.GetChild(0).gameObject;
             _challengeInnerCanvas = transform.GetChild(1).gameObject;
+            _challengeTimeout = transform.GetChild(2).gameObject;
             _challengeHeader = _challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>();
             _challengeOuterCanvas.SetActive(false);
             _challengeInnerCanvas.SetActive(false);
+            _challengeTimeout.SetActive(false);
         }
 
         private void Start()
         {
+            _challengeStartTime = NetworkManager.Singleton.ServerTime.Time;
             print(
                 $"<color=#FFFF00>Challenge start at time {NetworkManager.Singleton.ServerTime.Time}</color>");
             print($"Client1Id: {Client1Id.Value} Client2Id: {Client2Id.Value}");
