@@ -43,7 +43,7 @@ namespace Challenges
             return instance;
         }
 
-        public static IEnumerator SimulateChallenge(GameObject challenge, GameObject player1, GameObject player2)
+        public static IEnumerator StartChallenge(GameObject challenge, GameObject player1, GameObject player2)
         {
             var player1NetworkBehaviour = player1.GetComponent<NetworkBehaviour>();
             var player2NetworkBehaviour = player2.GetComponent<NetworkBehaviour>();
@@ -54,7 +54,7 @@ namespace Challenges
 
             var challengeComponent = challenge.GetComponent<Challenge>();
 
-            yield return new WaitForSeconds(ChallengeSimulationTimeInSeconds);
+            yield return new WaitForSeconds(ChallengeTimeoutLimitInSeconds);
 
             var winnerId = challengeComponent.DecideWinner();
             var loserId = winnerId == player2Id
@@ -72,7 +72,7 @@ namespace Challenges
             if (winnerId == 0)
             {
                 print(
-                    $"Finishing challenge simulation between players {player1Id}" +
+                    $"Finishing challenge between players {player1Id}" +
                     $" and {player2Id}. No winner");
 
                 // Both players lose a health

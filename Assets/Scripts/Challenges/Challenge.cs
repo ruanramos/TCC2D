@@ -66,7 +66,7 @@ namespace Challenges
                     Input.inputString);
             }
 
-            var timeoutCounter = GameConstants.ChallengeSimulationTimeInSeconds -
+            var timeoutCounter = GameConstants.ChallengeTimeoutLimitInSeconds -
                                  (NetworkManager.Singleton.ServerTime.Time - _challengeStartTime);
             var timeoutText = timeoutCounter < 0 ? 0 : timeoutCounter;
 

@@ -21,7 +21,7 @@ public static class GameConstants
     public const float PostChallengeSpeedMultiplier = 2f;
     public const float PlayerAlphaWhileInChallenge = 0.4f;
     public const float ChallengeWinnerTime = 3f;
-    
+    public const int ChallengeTimeoutLimitInSeconds = 10;
 
     public enum ChallengeType
     {
@@ -48,7 +48,6 @@ public static class GameConstants
 
     // Debug
     public const bool DebugMode = true;
-    public const int ChallengeSimulationTimeInSeconds = 10;
 
     // Tags
     public const string PlayerTag = "Player";
