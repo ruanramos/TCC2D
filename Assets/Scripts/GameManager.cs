@@ -78,7 +78,7 @@ public class GameManager : NetworkBehaviour
     private static string ConstructHighscoreListString()
     {
         var scores = GetScores();
-        var highscoreListString = "Best Players:\n";
+        var highscoreListString = $"Top {MaximumPlayersToDisplayScore}\n";
         var myEnumerator = scores.GetEnumerator();
         var count = 0;
 
