@@ -21,16 +21,6 @@ public class GameManager : NetworkBehaviour
         if (Camera.main != null) _mainCamera = Camera.main.gameObject;
     }
 
-    private void CreateClientData(ulong clientId)
-    {
-        if (!IsServer) return;
-        var playerRandomColor = Random.ColorHSV();
-        Debug.LogWarning($"Server assigned new player {clientId} color {playerRandomColor}");
-        var newPlayerData = new PlayerData(clientId, playerRandomColor);
-        ConnectedPlayers.Add(newPlayerData);
-        print("Added new player to connected players list");
-    }
-
     private void Update()
     {
         if (IsServer)
