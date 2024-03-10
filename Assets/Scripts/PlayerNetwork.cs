@@ -125,6 +125,8 @@ public class PlayerNetwork : NetworkBehaviour
         {
             print($"Player {OwnerClientId} had a score of {previousScore}" +
                   $" and now has a score of {currentScore}");
+            GameManager.UpdateHighscoreList();
+
             return;
         }
 
@@ -280,5 +282,10 @@ public class PlayerNetwork : NetworkBehaviour
     public void SetLives(int value)
     {
         _lives.Value = value;
+    }
+
+    public int GetScore()
+    {
+        return _score.Value;
     }
 }

@@ -45,6 +45,7 @@ public static class GameConstants
     // Game
     public const bool MaximumGamePointsCapped = false;
     public const int MaximumGamePointsCap = 5000;
+    public const int MaximumPlayersToDisplayScore = 3;
 
     // Debug
     public const bool DebugMode = true;
