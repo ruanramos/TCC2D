@@ -17,11 +17,12 @@ public static class GameConstants
 
     // Challenges
     public const int ChallengeValue = 50;
+    public const float ChallengeStartDelayInSeconds = 3f;
     public const float PostChallengeInvincibilityTimeInSeconds = 3f;
     public const float PostChallengeSpeedMultiplier = 2f;
     public const float PlayerAlphaWhileInChallenge = 0.4f;
     public const float ChallengeWinnerTime = 3f;
-    public const int ChallengeTimeoutLimitInSeconds = 10;
+    public const int ChallengeTimeoutLimitInSeconds = 3;
 
     public enum ChallengeType
     {

@@ -45,6 +45,8 @@ namespace Challenges
 
         public static IEnumerator StartChallenge(GameObject challenge, GameObject player1, GameObject player2)
         {
+            yield return new WaitForSeconds(ChallengeStartDelayInSeconds);
+
             var player1NetworkBehaviour = player1.GetComponent<NetworkBehaviour>();
             var player2NetworkBehaviour = player2.GetComponent<NetworkBehaviour>();
             var player1Network = player1.GetComponent<PlayerNetwork>();

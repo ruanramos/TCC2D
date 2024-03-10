@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using static GameConstants;
 
 namespace Challenges
 {
@@ -66,9 +67,11 @@ namespace Challenges
                     Input.inputString);
             }
 
-            var timeoutCounter = GameConstants.ChallengeTimeoutLimitInSeconds -
-                                 (NetworkManager.Singleton.ServerTime.Time - _challengeStartTime);
-            var timeoutText = timeoutCounter < 0 ? 0 : timeoutCounter;
+            var timeoutCounter = ChallengeTimeoutLimitInSeconds -
+                (NetworkManager.Singleton.ServerTime.Time - _challengeStartTime) + ChallengeStartDelayInSeconds;
+
+            var timeoutText = timeoutCounter > 10 ? 10 : timeoutCounter < 0 ? 0 : timeoutCounter;
+
 
             _challengeTimeout.GetComponent<TextMeshProUGUI>().text =
                 $"{Math.Round(timeoutText, 2)}";
