@@ -201,8 +201,10 @@ namespace Challenges
         public void DisplayResultsServerRpc(ulong client1Id, ulong client2Id, ulong winnerId,
             RpcParams rpcParams = default)
         {
-            DisplayResultsClientRpc(winnerId, _clientFinishTimestamps[Client1Id.Value],
-                _clientFinishTimestamps[Client2Id.Value],
+            var client1Timestamp = _clientFinishTimestamps.GetValueOrDefault(client1Id, 0);
+            var client2Timestamp = _clientFinishTimestamps.GetValueOrDefault(client2Id, 0);
+
+            DisplayResultsClientRpc(winnerId, client1Timestamp, client2Timestamp,
                 RpcTarget.Group(new[] { client1Id, client2Id }, RpcTargetUse.Temp));
         }
 
