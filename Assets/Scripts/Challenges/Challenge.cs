@@ -24,8 +24,6 @@ namespace Challenges
 
         private void Awake()
         {
-            print(
-                $"<color=#FFFF00>Challenge awake at time {NetworkManager.Singleton.ServerTime.Time}</color>");
             _challengeOuterCanvas = transform.GetChild(0).gameObject;
             _challengeInnerCanvas = transform.GetChild(1).gameObject;
             _challengeTimeout = _challengeOuterCanvas.transform.GetChild(2).gameObject;
@@ -70,8 +68,8 @@ namespace Challenges
             var timeoutCounter = ChallengeTimeoutLimitInSeconds -
                 (NetworkManager.Singleton.ServerTime.Time - _challengeStartTime) + ChallengeStartDelayInSeconds;
 
-            var timeoutText = timeoutCounter > 10 ? 10 : timeoutCounter < 0 ? 0 : timeoutCounter;
-
+            var timeoutText = timeoutCounter > ChallengeTimeoutLimitInSeconds ? ChallengeTimeoutLimitInSeconds :
+                timeoutCounter < 0 ? 0 : timeoutCounter;
 
             _challengeTimeout.GetComponent<TextMeshProUGUI>().text =
                 $"{Math.Round(timeoutText, 2)}";
