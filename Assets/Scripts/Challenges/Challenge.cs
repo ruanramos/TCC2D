@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 using static GameConstants;
 
 namespace Challenges
@@ -22,6 +23,9 @@ namespace Challenges
         private GameObject _challengeInfo;
         private TextMeshProUGUI _challengeInfoText;
 
+        public GameObject startIndicator;
+        private Image _startIndicatorImage;
+
         private double _challengeStartTime;
 
         private void Awake()
@@ -37,6 +41,8 @@ namespace Challenges
             _challengeInnerCanvas.SetActive(false);
             _challengeTimeout.SetActive(false);
             _challengeInfo.SetActive(false);
+
+            _startIndicatorImage = startIndicator.GetComponent<Image>();
         }
 
         private void Start()
@@ -76,9 +82,15 @@ namespace Challenges
 
             _challengeTimeoutText.text = GetTimeoutText();
 
-            if (IsInDelayTime())
+            if (IsInDelayTime() && _startIndicatorImage.color != Color.red)
             {
                 _challengeInfoText.text = GetDelayText();
+                _startIndicatorImage.color = Color.red;
+            }
+
+            if (CanSendInput() && _startIndicatorImage.color != Color.green)
+            {
+                _startIndicatorImage.color = Color.green;
             }
 
             // Check if client running this is involved in challenge
