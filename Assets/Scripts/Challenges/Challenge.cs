@@ -48,13 +48,18 @@ namespace Challenges
                 : $"Player {Client2Id.Value} X Player {Client1Id.Value}";
             print(
                 $"<color=#FF0000>C1: {Client1Id.Value} - C2: {Client2Id.Value} - Owner: {OwnerClientId} - Localclient: {NetworkManager.LocalClient.ClientId}</color>");
-            if ((Client1Id.Value == NetworkManager.LocalClient.ClientId ||
-                 Client2Id.Value == NetworkManager.LocalClient.ClientId))
+            if (LocalClientInChallenge())
             {
                 _challengeOuterCanvas.SetActive(true);
                 _challengeInnerCanvas.SetActive(true);
                 _challengeTimeout.SetActive(true);
             }
+        }
+
+        private bool LocalClientInChallenge()
+        {
+            return (Client1Id.Value == NetworkManager.LocalClient.ClientId ||
+                    Client2Id.Value == NetworkManager.LocalClient.ClientId);
         }
 
         private void Update()
