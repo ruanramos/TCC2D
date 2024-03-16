@@ -212,7 +212,7 @@ namespace Challenges
         {
             print(
                 $"<color=#FF00AA>Setting winner text for challenge between {Client1Id.Value} and {Client2Id.Value}</color>");
-            _challengeInfo.GetComponent<TextMeshProUGUI>().text = winnerId == 0
+            _challengeInfoText.text = winnerId == 0
                 ? "No winner"
                 : $"Player {Client1Id.Value}: {client1Timestamp - _challengeStartTime} \n" +
                   $" Player {Client2Id.Value}: {client2Timestamp - _challengeStartTime} \n\n" +
