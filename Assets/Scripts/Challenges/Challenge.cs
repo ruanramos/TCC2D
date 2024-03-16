@@ -18,7 +18,9 @@ namespace Challenges
         private GameObject _challengeOuterCanvas;
         private GameObject _challengeInnerCanvas;
         private GameObject _challengeTimeout;
+        private TextMeshProUGUI _challengeTimeoutText;
         private GameObject _challengeInfo;
+        private TextMeshProUGUI _challengeInfoText;
 
         private double _challengeStartTime;
 
@@ -27,7 +29,9 @@ namespace Challenges
             _challengeOuterCanvas = transform.GetChild(0).gameObject;
             _challengeInnerCanvas = transform.GetChild(1).gameObject;
             _challengeTimeout = _challengeOuterCanvas.transform.GetChild(2).gameObject;
+            _challengeTimeoutText = _challengeTimeout.GetComponent<TextMeshProUGUI>();
             _challengeInfo = _challengeOuterCanvas.transform.GetChild(3).gameObject;
+            _challengeInfoText = _challengeInfo.GetComponent<TextMeshProUGUI>();
             _challengeHeader = _challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>();
             _challengeOuterCanvas.SetActive(false);
             _challengeInnerCanvas.SetActive(false);
@@ -70,11 +74,12 @@ namespace Challenges
                     Input.inputString);
             }
 
-            _challengeTimeout.GetComponent<TextMeshProUGUI>().text = GetTimeoutText();
+            _challengeTimeoutText.text = GetTimeoutText();
 
             if (IsInDelayTime())
             {
                 _challengeInfo.GetComponent<TextMeshProUGUI>().text = GetDelayText();
+                _challengeInfoText.text = GetDelayText();
             }
 
             // Check if client running this is involved in challenge
