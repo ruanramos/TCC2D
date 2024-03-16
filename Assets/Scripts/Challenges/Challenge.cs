@@ -194,20 +194,25 @@ namespace Challenges
         }
 
         [Rpc(SendTo.Server)]
-        public void SetWinnerTextServerRpc(ulong client1Id, ulong client2Id, ulong winnerId,
+        public void DisplayResultsServerRpc(ulong client1Id, ulong client2Id, ulong winnerId,
             RpcParams rpcParams = default)
         {
-            SetWinnerTextClientRpc(winnerId, RpcTarget.Group(new[] { client1Id, client2Id }, RpcTargetUse.Temp));
+            DisplayResultsClientRpc(winnerId, _clientFinishTimestamps[Client1Id.Value],
+                _clientFinishTimestamps[Client2Id.Value],
+                RpcTarget.Group(new[] { client1Id, client2Id }, RpcTargetUse.Temp));
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        private void SetWinnerTextClientRpc(ulong winnerId, RpcParams rpcParams = default)
+        private void DisplayResultsClientRpc(ulong winnerId, double client1Timestamp, double client2Timestamp,
+            RpcParams rpcParams = default)
         {
             print(
                 $"<color=#FF00AA>Setting winner text for challenge between {Client1Id.Value} and {Client2Id.Value}</color>");
             _challengeInfo.GetComponent<TextMeshProUGUI>().text = winnerId == 0
                 ? "No winner"
-                : $"Player {winnerId} wins";
+                : $"Player {Client1Id.Value}: {client1Timestamp - _challengeStartTime} \n" +
+                  $" Player {Client2Id.Value}: {client2Timestamp - _challengeStartTime} \n\n" +
+                  $" Player {winnerId} wins the challenge!";
         }
     }
 }

@@ -64,7 +64,7 @@ namespace Challenges
                 : player2Id;
 
             // Set text to show winner
-            challengeComponent.SetWinnerTextServerRpc(player1Id, player2Id, winnerId);
+            challengeComponent.DisplayResultsServerRpc(player1Id, player2Id, winnerId);
 
             yield return new WaitForSeconds(ChallengeWinnerTime);
 
