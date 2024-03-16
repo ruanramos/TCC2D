@@ -18,7 +18,7 @@ namespace Challenges
         private GameObject _challengeOuterCanvas;
         private GameObject _challengeInnerCanvas;
         private GameObject _challengeTimeout;
-        private GameObject _challengeWinner;
+        private GameObject _challengeInfo;
 
         private double _challengeStartTime;
 
@@ -27,12 +27,12 @@ namespace Challenges
             _challengeOuterCanvas = transform.GetChild(0).gameObject;
             _challengeInnerCanvas = transform.GetChild(1).gameObject;
             _challengeTimeout = _challengeOuterCanvas.transform.GetChild(2).gameObject;
-            _challengeWinner = _challengeOuterCanvas.transform.GetChild(3).gameObject;
+            _challengeInfo = _challengeOuterCanvas.transform.GetChild(3).gameObject;
             _challengeHeader = _challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>();
             _challengeOuterCanvas.SetActive(false);
             _challengeInnerCanvas.SetActive(false);
             _challengeTimeout.SetActive(false);
-            _challengeWinner.SetActive(false);
+            _challengeInfo.SetActive(false);
         }
 
         private void Start()
@@ -41,11 +41,13 @@ namespace Challenges
             _challengeHeader.text = Client1Id.Value == NetworkManager.LocalClient.ClientId
                 ? $"Player {Client1Id.Value} X Player {Client2Id.Value}"
                 : $"Player {Client2Id.Value} X Player {Client1Id.Value}";
+
             if (LocalClientInChallenge())
             {
                 _challengeOuterCanvas.SetActive(true);
                 _challengeInnerCanvas.SetActive(true);
                 _challengeTimeout.SetActive(true);
+                _challengeInfo.SetActive(true);
             }
         }
 
@@ -53,6 +55,11 @@ namespace Challenges
         {
             return (Client1Id.Value == NetworkManager.LocalClient.ClientId ||
                     Client2Id.Value == NetworkManager.LocalClient.ClientId);
+        }
+
+        private bool IsInDelayTime()
+        {
+            return ChallengeDuration() < ChallengeStartDelayInSeconds;
         }
 
         private void Update()
@@ -65,14 +72,12 @@ namespace Challenges
                     Input.inputString);
             }
 
-            var timeoutCounter = ChallengeTimeoutLimitInSeconds -
-                (NetworkManager.Singleton.ServerTime.Time - _challengeStartTime) + ChallengeStartDelayInSeconds;
+            _challengeTimeout.GetComponent<TextMeshProUGUI>().text = GetTimeoutText();
 
-            var timeoutText = timeoutCounter > ChallengeTimeoutLimitInSeconds ? ChallengeTimeoutLimitInSeconds :
-                timeoutCounter < 0 ? 0 : timeoutCounter;
-
-            _challengeTimeout.GetComponent<TextMeshProUGUI>().text =
-                $"{Math.Round(timeoutText, 2)}";
+            if (IsInDelayTime())
+            {
+                _challengeInfo.GetComponent<TextMeshProUGUI>().text = GetDelayText();
+            }
 
             // Check if client running this is involved in challenge
             if ((Client1Id.Value == 0 && Client2Id.Value == 0) ||
@@ -85,11 +90,37 @@ namespace Challenges
             _challengeOuterCanvas.SetActive(true);
             _challengeInnerCanvas.SetActive(true);
             _challengeTimeout.SetActive(true);
+            _challengeInfo.SetActive(true);
 
             // Make local client name appear first in challenge header
             _challengeHeader.text = Client1Id.Value == NetworkManager.LocalClient.ClientId
                 ? $"Player {Client1Id.Value} X Player {Client2Id.Value}"
                 : $"Player {Client2Id.Value} X Player {Client1Id.Value}";
+        }
+
+        private string GetTimeoutText()
+        {
+            var timeoutCounter = ChallengeTimeoutLimitInSeconds - ChallengeDuration() + ChallengeStartDelayInSeconds;
+
+            var timeoutText = timeoutCounter > ChallengeTimeoutLimitInSeconds ? ChallengeTimeoutLimitInSeconds :
+                timeoutCounter < 0 ? 0 : Math.Round(timeoutCounter, 2);
+
+            return $"{timeoutText}";
+        }
+
+        private double ChallengeDuration()
+        {
+            return NetworkManager.Singleton.ServerTime.Time - _challengeStartTime;
+        }
+
+        private string GetDelayText()
+        {
+            var delayCounter = ChallengeStartDelayInSeconds - ChallengeDuration();
+
+            var delayText = delayCounter > ChallengeStartDelayInSeconds ? ChallengeStartDelayInSeconds :
+                delayCounter < 0 ? 0 : Math.Round(delayCounter, 2);
+
+            return delayText == 0 ? "GO!" : $"Starts in {delayText}s";
         }
 
         public override void OnNetworkDespawn()
@@ -171,10 +202,9 @@ namespace Challenges
         [Rpc(SendTo.SpecifiedInParams)]
         private void SetWinnerTextClientRpc(ulong winnerId, RpcParams rpcParams = default)
         {
-            _challengeWinner.SetActive(true);
             print(
                 $"<color=#FF00AA>Setting winner text for challenge between {Client1Id.Value} and {Client2Id.Value}</color>");
-            _challengeWinner.GetComponent<TextMeshProUGUI>().text = winnerId == 0
+            _challengeInfo.GetComponent<TextMeshProUGUI>().text = winnerId == 0
                 ? "No winner"
                 : $"Player {winnerId} wins";
         }
