@@ -78,7 +78,6 @@ namespace Challenges
 
             if (IsInDelayTime())
             {
-                _challengeInfo.GetComponent<TextMeshProUGUI>().text = GetDelayText();
                 _challengeInfoText.text = GetDelayText();
             }
 
