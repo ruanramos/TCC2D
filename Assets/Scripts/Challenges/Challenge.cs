@@ -69,7 +69,7 @@ namespace Challenges
 
         private bool IsInDelayTime()
         {
-            return ChallengeDuration() < ChallengeStartDelayInSeconds;
+            return ChallengeDuration() <= ChallengeStartDelayInSeconds;
         }
 
         private void Update()
