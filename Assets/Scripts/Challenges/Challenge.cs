@@ -103,7 +103,7 @@ namespace Challenges
             var timeoutCounter = ChallengeTimeoutLimitInSeconds - ChallengeDuration() + ChallengeStartDelayInSeconds;
 
             var timeoutText = timeoutCounter > ChallengeTimeoutLimitInSeconds ? ChallengeTimeoutLimitInSeconds :
-                timeoutCounter < 0 ? 0 : Math.Round(timeoutCounter, 2);
+                timeoutCounter < 0 ? 0 : Math.Round(timeoutCounter, 1);
 
             return $"{timeoutText}";
         }
@@ -123,9 +123,9 @@ namespace Challenges
             var delayCounter = ChallengeStartDelayInSeconds - ChallengeDuration();
 
             var delayText = delayCounter > ChallengeStartDelayInSeconds ? ChallengeStartDelayInSeconds :
-                delayCounter < 0 ? 0 : Math.Round(delayCounter, 2);
+                delayCounter < 0 ? 0 : Math.Round(delayCounter, 1);
 
-            return delayText == 0 ? "GO!" : $"Starts in {delayText}s";
+            return delayText == 0 ? "" : $"Starts in {delayText}s";
         }
 
         public override void OnNetworkDespawn()
