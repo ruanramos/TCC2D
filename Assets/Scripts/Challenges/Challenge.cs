@@ -64,9 +64,7 @@ namespace Challenges
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Space) &&
-                (Client1Id.Value == NetworkManager.LocalClient.ClientId ||
-                 Client2Id.Value == NetworkManager.LocalClient.ClientId))
+            if (Input.GetKeyDown(KeyCode.Space) && LocalClientInChallenge() && CanSendInput())
             {
                 SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
                     Input.inputString);
@@ -111,6 +109,11 @@ namespace Challenges
         private double ChallengeDuration()
         {
             return NetworkManager.Singleton.ServerTime.Time - _challengeStartTime;
+        }
+
+        private bool CanSendInput()
+        {
+            return !IsInDelayTime();
         }
 
         private string GetDelayText()
