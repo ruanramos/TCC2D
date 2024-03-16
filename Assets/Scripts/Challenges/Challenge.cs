@@ -84,7 +84,7 @@ namespace Challenges
 
             if (IsInDelayTime() && _startIndicatorImage.color != Color.red)
             {
-                _challengeInfoText.text = GetDelayText();
+                //_challengeInfoText.text = GetDelayText();
                 _startIndicatorImage.color = Color.red;
             }
 
@@ -228,8 +228,8 @@ namespace Challenges
                 $"<color=#FF00AA>Setting winner text for challenge between {Client1Id.Value} and {Client2Id.Value}</color>");
             _challengeInfoText.text = winnerId == 0
                 ? "No winner"
-                : $"Player {Client1Id.Value}: {client1Timestamp - _challengeStartTime} \n" +
-                  $" Player {Client2Id.Value}: {client2Timestamp - _challengeStartTime} \n\n" +
+                : $"Player {Client1Id.Value}: {client1Timestamp - _challengeStartTime - ChallengeStartDelayInSeconds} \n" +
+                  $" Player {Client2Id.Value}: {client2Timestamp - _challengeStartTime - ChallengeStartDelayInSeconds} \n\n" +
                   $" Player {winnerId} wins the challenge!";
         }
     }
