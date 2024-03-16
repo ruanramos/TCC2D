@@ -78,9 +78,7 @@ namespace Challenges
             }
 
             // Check if client running this is involved in challenge
-            if ((Client1Id.Value == 0 && Client2Id.Value == 0) ||
-                (Client1Id.Value != NetworkManager.LocalClient.ClientId &&
-                 Client2Id.Value != NetworkManager.LocalClient.ClientId) ||
+            if ((Client1Id.Value == 0 && Client2Id.Value == 0) || !LocalClientInChallenge() ||
                 _challengeHeader.text.Equals($"Player {Client1Id.Value} X Player {Client2Id.Value}") ||
                 _challengeHeader.text.Equals($"Player {Client2Id.Value} X Player {Client1Id.Value}")) return;
 
