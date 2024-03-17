@@ -29,10 +29,7 @@ public class GameManager : NetworkBehaviour
         if (Camera.main != null) _mainCamera = Camera.main.gameObject;
 
         _connectedPlayersText = GameObject.Find("ConnectedPlayersText");
-        if (!IsServer)
-        {
-            _connectedPlayersText.SetActive(false);
-        }
+        _connectedPlayersText.SetActive(false);
     }
 
     private void Update()
@@ -72,6 +69,10 @@ public class GameManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        if (IsServer)
+        {
+            _connectedPlayersText.SetActive(true);
+        }
         NetworkManager.Singleton.OnConnectionEvent += (_, type) => { UpdateConnectedPlayersText(type.EventType); };
     }
 

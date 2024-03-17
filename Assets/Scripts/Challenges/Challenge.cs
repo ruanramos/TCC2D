@@ -224,12 +224,23 @@ namespace Challenges
         private void DisplayResultsClientRpc(ulong winnerId, double client1Timestamp, double client2Timestamp,
             RpcParams rpcParams = default)
         {
+            var client1Reaction = client1Timestamp - _challengeStartTime - ChallengeStartDelayInSeconds;
+            var client2Reaction = client2Timestamp - _challengeStartTime - ChallengeStartDelayInSeconds;
+
+            var client1ReactionTimeText = client1Reaction > ChallengeTimeoutLimitInSeconds
+                ? "No response"
+                : $"{client1Reaction}";
+
+            var client2ReactionTimeText = client2Reaction > ChallengeTimeoutLimitInSeconds
+                ? "No response"
+                : $"{client2Reaction}";
+
             print(
                 $"<color=#FF00AA>Setting winner text for challenge between {Client1Id.Value} and {Client2Id.Value}</color>");
             _challengeInfoText.text = winnerId == 0
                 ? "No winner"
-                : $"Player {Client1Id.Value}: {client1Timestamp - _challengeStartTime - ChallengeStartDelayInSeconds} \n" +
-                  $" Player {Client2Id.Value}: {client2Timestamp - _challengeStartTime - ChallengeStartDelayInSeconds} \n\n" +
+                : $"Player {Client1Id.Value}: {client1ReactionTimeText} \n" +
+                  $" Player {Client2Id.Value}: {client2ReactionTimeText} \n\n" +
                   $" Player {winnerId} wins the challenge!";
         }
     }
