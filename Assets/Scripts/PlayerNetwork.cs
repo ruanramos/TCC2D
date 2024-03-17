@@ -22,7 +22,6 @@ public class PlayerNetwork : NetworkBehaviour
     private GameObject _currentChallenge;
     private NetworkVariable<int> _lives = new(StartingLives);
 
-
     private void Awake()
     {
         _scoreText = GameObject.Find("ScoreUI").GetComponentInChildren<TextMeshProUGUI>();

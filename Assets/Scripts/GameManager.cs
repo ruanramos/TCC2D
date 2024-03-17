@@ -110,7 +110,6 @@ public class GameManager : NetworkBehaviour
         var highscoreListString = ConstructHighscoreListString();
         print($"{highscoreListString}");
         _scoreListText.text = highscoreListString;
-        print("AAAAAAAA");
     }
 
     private void UpdateConnectedPlayersText(ConnectionEvent type)
