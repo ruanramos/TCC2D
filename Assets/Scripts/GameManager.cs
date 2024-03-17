@@ -15,6 +15,8 @@ public class GameManager : NetworkBehaviour
     private TextMeshProUGUI _devInfoText;
     private static TextMeshProUGUI _scoreListText;
 
+    private GameObject _connectedPlayersText;
+
 
     private void Awake()
     {
@@ -25,6 +27,12 @@ public class GameManager : NetworkBehaviour
         _scoreListText = _scoreList.GetComponent<TextMeshProUGUI>();
 
         if (Camera.main != null) _mainCamera = Camera.main.gameObject;
+
+        _connectedPlayersText = GameObject.Find("ConnectedPlayersText");
+        if (!IsServer)
+        {
+            _connectedPlayersText.SetActive(false);
+        }
     }
 
     private void Update()
@@ -60,6 +68,11 @@ public class GameManager : NetworkBehaviour
         if (!NetworkManager.Singleton.IsClient) return;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         NetworkManager.Singleton.Shutdown();
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        NetworkManager.Singleton.OnConnectionEvent += (_, type) => { UpdateConnectedPlayersText(type.EventType); };
     }
 
     private static Dictionary<ulong, int> GetScores()
@@ -98,5 +111,23 @@ public class GameManager : NetworkBehaviour
         print($"{highscoreListString}");
         _scoreListText.text = highscoreListString;
         print("AAAAAAAA");
+    }
+
+    private void UpdateConnectedPlayersText(ConnectionEvent type)
+    {
+        if (!IsServer) return;
+        if (!_connectedPlayersText.activeSelf)
+        {
+            _connectedPlayersText.SetActive(true);
+        }
+
+        _connectedPlayersText.GetComponent<TextMeshProUGUI>().text = type switch
+        {
+            ConnectionEvent.ClientConnected =>
+                $"Connected players: {NetworkManager.Singleton.ConnectedClientsList.Count()}\n",
+            ConnectionEvent.ClientDisconnected =>
+                $"Connected players: {NetworkManager.Singleton.ConnectedClientsList.Count() - 1}\n",
+            _ => _connectedPlayersText.GetComponent<TextMeshProUGUI>().text
+        };
     }
 }
