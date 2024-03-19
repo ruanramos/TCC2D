@@ -48,6 +48,7 @@ public class PlayerNetwork : NetworkBehaviour
         _playerLabelText = player.GetComponentInChildren<TextMeshPro>();
         UpdatePlayerLabel();
         _playerLabelText.color = Color.blue;
+        GameManager.UpdateHighscoreList();
 
         switch (IsOwner)
         {
@@ -125,12 +126,11 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void TreatScoreChanged(int previousScore, int currentScore)
     {
+        GameManager.UpdateHighscoreList();
         if (IsServer)
         {
             print($"Player {OwnerClientId} had a score of {previousScore}" +
                   $" and now has a score of {currentScore}");
-            GameManager.UpdateHighscoreList();
-
             return;
         }
 
