@@ -120,6 +120,11 @@ namespace Challenges
                 _startIndicatorImage.color = Color.green;
             }
 
+            if (!CanSendInput() && !IsInDelayTime())
+            {
+                _startIndicatorImage.enabled = false;
+            }
+
             // Check if client running this is involved in challenge
             if ((Client1Id.Value == 0 && Client2Id.Value == 0) || !LocalClientInChallenge() ||
                 _challengeHeader.text.Equals($"Player {Client1Id.Value} X Player {Client2Id.Value}") ||
