@@ -120,7 +120,8 @@ namespace Challenges
                 _challengeTimeout.SetActive(true);
             }
 
-            if (!IsInChallengeTime() && !IsInDelayTime())
+            if (!IsInChallengeTime() && !IsInDelayTime() &&
+                (_startIndicatorImage.enabled || _challengeTimeout.activeSelf))
             {
                 _startIndicatorImage.enabled = false;
                 _challengeTimeout.SetActive(false);
@@ -190,13 +191,11 @@ namespace Challenges
                     // Print what player didn't finish the challenge
                     foreach (var clientId in new[] { Client1Id.Value, Client2Id.Value })
                     {
-                        if (!_clientFinishTimestamps.ContainsKey(clientId))
-                        {
-                            print(
-                                $"<color=#FF00AA>{clientId} didn't finish the challenge</color>");
-                            // Set timestamp to ulong.MaxValue if client didn't finish challenge
-                            _clientFinishTimestamps[clientId] = ulong.MaxValue;
-                        }
+                        if (_clientFinishTimestamps.ContainsKey(clientId)) continue;
+                        print(
+                            $"<color=#FF00AA>{clientId} didn't finish the challenge</color>");
+                        // Set timestamp to ulong.MaxValue if client didn't finish challenge
+                        _clientFinishTimestamps[clientId] = ulong.MaxValue;
                     }
 
                     break;
