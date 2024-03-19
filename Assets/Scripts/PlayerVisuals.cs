@@ -2,6 +2,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using static GameConstants;
+using Random = UnityEngine.Random;
 
 public class PlayerVisuals : NetworkBehaviour
 {
