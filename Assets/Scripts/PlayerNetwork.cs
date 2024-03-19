@@ -22,10 +22,15 @@ public class PlayerNetwork : NetworkBehaviour
     private GameObject _currentChallenge;
     private NetworkVariable<int> _lives = new(StartingLives);
 
+    private CircleCollider2D _collider;
+    private NetworkRigidbody2D _networkRigidbody;
+
     private void Awake()
     {
         _scoreText = GameObject.Find("ScoreUI").GetComponentInChildren<TextMeshProUGUI>();
         _visuals = gameObject.AddComponent<PlayerVisuals>();
+        _collider = gameObject.GetComponent<CircleCollider2D>();
+        _networkRigidbody = gameObject.GetComponent<NetworkRigidbody2D>();
     }
 
     public override void OnNetworkSpawn()
@@ -185,8 +190,8 @@ public class PlayerNetwork : NetworkBehaviour
     {
         _speedMultiplier = multiplier;
         yield return new WaitForSeconds(PostChallengeInvincibilityTimeInSeconds);
-        gameObject.GetComponent<CircleCollider2D>().enabled = true;
-        gameObject.GetComponent<NetworkRigidbody2D>().enabled = true;
+        _collider.enabled = true;
+        _networkRigidbody.enabled = true;
         _speedMultiplier = 1;
     }
 

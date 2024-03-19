@@ -46,12 +46,12 @@ namespace Challenges
             _challengeInfoText = _challengeInfo.GetComponent<TextMeshProUGUI>();
             _challengeHeader = _challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>();
             _challengeFlashImage = _challengeOuterCanvas.GetComponent<Image>();
+            _startIndicatorImage = startIndicator.GetComponent<Image>();
+
             _challengeOuterCanvas.SetActive(false);
             _challengeInnerCanvas.SetActive(false);
             _challengeTimeout.SetActive(false);
             _challengeInfo.SetActive(false);
-
-            _startIndicatorImage = startIndicator.GetComponent<Image>();
         }
 
         private void Start()
@@ -89,8 +89,7 @@ namespace Challenges
             if (Input.GetKeyDown(KeyCode.Space) && LocalClientInChallenge())
             {
                 if (ChallengeDuration() > _timeUntilStart &&
-                    ChallengeDuration() < _timeUntilWinner &&
-                    CanSendInput())
+                    ChallengeDuration() < _timeUntilWinner && CanSendInput())
                 {
                     // Send player positive feedback
                     if (!_clientFinishTimestamps.ContainsKey(NetworkManager.Singleton.LocalClientId))

@@ -6,6 +6,14 @@ using static GameConstants;
 public class PlayerVisuals : NetworkBehaviour
 {
     private NetworkVariable<Color> _color = new();
+    private SpriteRenderer _spriteRenderer;
+    private PlayerNetwork _playerNetwork;
+
+    private void Awake()
+    {
+        _spriteRenderer = gameObject.GetComponentInChildren<SpriteRenderer>();
+        _playerNetwork = gameObject.GetComponent<PlayerNetwork>();
+    }
 
     private void TreatColorChanged(Color previousColor, Color currentColor)
     {
@@ -29,12 +37,11 @@ public class PlayerVisuals : NetworkBehaviour
 
     public IEnumerator MakePlayerTransparentWhileInChallenge()
     {
-        var playerRenderer = GetComponentInChildren<SpriteRenderer>();
-        var color = playerRenderer.color;
-        playerRenderer.color = new Color(color.r, color.g, color.b, PlayerAlphaWhileInChallenge);
-        yield return new WaitWhile(() => GetComponent<PlayerNetwork>().GetIsInChallenge());
+        var color = _spriteRenderer.color;
+        _spriteRenderer.color = new Color(color.r, color.g, color.b, PlayerAlphaWhileInChallenge);
+        yield return new WaitWhile(() => _playerNetwork.GetIsInChallenge());
         yield return new WaitForSeconds(PostChallengeInvincibilityTimeInSeconds);
-        playerRenderer.color = color;
+        _spriteRenderer.color = color;
     }
 
     [ServerRpc]

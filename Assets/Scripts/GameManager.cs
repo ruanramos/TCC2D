@@ -109,7 +109,6 @@ public class GameManager : NetworkBehaviour
     public static void UpdateHighscoreList()
     {
         var highscoreListString = ConstructHighscoreListString();
-        print($"{highscoreListString}");
         _scoreListText.text = highscoreListString;
     }
 
