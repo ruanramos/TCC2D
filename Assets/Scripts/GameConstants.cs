@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public static class GameConstants
 {
     // Camera
@@ -23,6 +25,11 @@ public static class GameConstants
     public const float PlayerAlphaWhileInChallenge = 0.4f;
     public const float ChallengeWinnerTime = 3f;
     public const int ChallengeTimeoutLimitInSeconds = 3;
+
+    public static readonly Color ScreenFlashGreen = new(0f, 255f, 0f, 0.4f);
+    public static readonly Color ScreenFlashRed = new(255f, 0f, 0f, 0.4f);
+    public const float ColorFlashTime = 0.1f;
+    
 
     public enum ChallengeType
     {

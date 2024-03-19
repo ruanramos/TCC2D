@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
@@ -28,6 +29,8 @@ namespace Challenges
 
         private double _challengeStartTime;
 
+        private Image _challengeFlashImage;
+
         private void Awake()
         {
             _challengeOuterCanvas = transform.GetChild(0).gameObject;
@@ -37,6 +40,7 @@ namespace Challenges
             _challengeInfo = _challengeOuterCanvas.transform.GetChild(3).gameObject;
             _challengeInfoText = _challengeInfo.GetComponent<TextMeshProUGUI>();
             _challengeHeader = _challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>();
+            _challengeFlashImage = _challengeOuterCanvas.GetComponent<Image>();
             _challengeOuterCanvas.SetActive(false);
             _challengeInnerCanvas.SetActive(false);
             _challengeTimeout.SetActive(false);
@@ -74,10 +78,27 @@ namespace Challenges
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Space) && LocalClientInChallenge() && CanSendInput())
+            if (Input.GetKeyDown(KeyCode.Space) && LocalClientInChallenge())
             {
-                SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
-                    Input.inputString);
+                if (ChallengeDuration() > ChallengeStartDelayInSeconds &&
+                    ChallengeDuration() < ChallengeTimeoutLimitInSeconds + ChallengeStartDelayInSeconds &&
+                    CanSendInput())
+                {
+                    // Send player positive feedback
+                    if (!_clientFinishTimestamps.ContainsKey(NetworkManager.Singleton.LocalClientId))
+                    {
+                        StartCoroutine(TurnScreenGreen());
+                    }
+
+                    SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
+                        Input.inputString);
+                }
+
+                if (ChallengeDuration() < ChallengeStartDelayInSeconds)
+                {
+                    // Send player negative feedback
+                    StartCoroutine(FlashScreenRed());
+                }
             }
 
             _challengeTimeoutText.text = GetTimeoutText();
@@ -201,6 +222,13 @@ namespace Challenges
         {
             var clientId = serverRpcParams.Receive.SenderClientId;
 
+            // Send keypress only if it's not stored yet
+            if (_clientFinishTimestamps.ContainsKey(clientId))
+            {
+                // Send negative feedback to player
+                return;
+            }
+
             print(
                 $"Received {key} press from client {clientId}\n" +
                 $"timestamp: {time}  --- Server time: {NetworkManager.Singleton.ServerTime.Time}");
@@ -242,6 +270,24 @@ namespace Challenges
                 : $"Player {Client1Id.Value}: {client1ReactionTimeText} \n" +
                   $" Player {Client2Id.Value}: {client2ReactionTimeText} \n\n" +
                   $" Player {winnerId} wins the challenge!";
+        }
+
+        // Coroutine to make screen flash red
+        private IEnumerator FlashScreenRed()
+        {
+            var originalColor = _challengeFlashImage.color;
+            _challengeFlashImage.color = ScreenFlashRed;
+            yield return new WaitForSeconds(ColorFlashTime);
+            _challengeFlashImage.color = originalColor;
+        }
+
+        // Coroutine to make screen flash green
+        private IEnumerator TurnScreenGreen()
+        {
+            var originalColor = _challengeFlashImage.color;
+            _challengeFlashImage.color = ScreenFlashGreen;
+            yield return new WaitUntil(() => ChallengeDuration() >= ChallengeStartDelayInSeconds + ChallengeTimeoutLimitInSeconds);
+            _challengeFlashImage.color = originalColor;
         }
     }
 }
