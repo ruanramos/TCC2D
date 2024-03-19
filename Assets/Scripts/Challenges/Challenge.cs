@@ -113,7 +113,6 @@ namespace Challenges
 
             if (IsInDelayTime() && _startIndicatorImage.color != Color.red)
             {
-                //_challengeInfoText.text = GetDelayText();
                 _startIndicatorImage.color = Color.red;
             }
 
@@ -157,16 +156,6 @@ namespace Challenges
         private bool CanSendInput()
         {
             return !IsInDelayTime() && ChallengeDuration() < _timeUntilWinner;
-        }
-
-        private string GetDelayText()
-        {
-            var delayCounter = ChallengeStartDelayInSeconds - ChallengeDuration();
-
-            var delayText = delayCounter > ChallengeStartDelayInSeconds ? ChallengeStartDelayInSeconds :
-                delayCounter < 0 ? 0 : Math.Round(delayCounter, 1);
-
-            return delayText == 0 ? "" : $"Starts in {delayText}s";
         }
 
         public override void OnNetworkDespawn()
