@@ -6,6 +6,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using static GameConstants;
+using Random = UnityEngine.Random;
 
 namespace Challenges
 {
@@ -30,6 +31,10 @@ namespace Challenges
         private double _challengeStartTime;
 
         private Image _challengeFlashImage;
+
+        private double _randomTimeSugar;
+        private double _timeUntilWinner;
+        private double _timeUntilStart;
 
         private void Awake()
         {
@@ -63,6 +68,9 @@ namespace Challenges
                 _challengeTimeout.SetActive(true);
                 _challengeInfo.SetActive(true);
             }
+
+            _timeUntilWinner = ChallengeTimeoutLimitInSeconds + ChallengeStartDelayInSeconds + _randomTimeSugar;
+            _timeUntilStart = ChallengeStartDelayInSeconds + _randomTimeSugar;
         }
 
         private bool LocalClientInChallenge()
@@ -73,15 +81,15 @@ namespace Challenges
 
         private bool IsInDelayTime()
         {
-            return ChallengeDuration() <= ChallengeStartDelayInSeconds;
+            return ChallengeDuration() <= _timeUntilStart;
         }
 
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Space) && LocalClientInChallenge())
             {
-                if (ChallengeDuration() > ChallengeStartDelayInSeconds &&
-                    ChallengeDuration() < ChallengeTimeoutLimitInSeconds + ChallengeStartDelayInSeconds &&
+                if (ChallengeDuration() > _timeUntilStart &&
+                    ChallengeDuration() < _timeUntilWinner &&
                     CanSendInput())
                 {
                     // Send player positive feedback
@@ -133,7 +141,7 @@ namespace Challenges
 
         private string GetTimeoutText()
         {
-            var timeoutCounter = ChallengeTimeoutLimitInSeconds - ChallengeDuration() + ChallengeStartDelayInSeconds;
+            var timeoutCounter = ChallengeTimeoutLimitInSeconds - ChallengeDuration() + _timeUntilStart;
 
             var timeoutText = timeoutCounter > ChallengeTimeoutLimitInSeconds ? ChallengeTimeoutLimitInSeconds :
                 timeoutCounter < 0 ? 0 : Math.Round(timeoutCounter, 1);
@@ -148,7 +156,7 @@ namespace Challenges
 
         private bool CanSendInput()
         {
-            return !IsInDelayTime();
+            return !IsInDelayTime() && ChallengeDuration() < _timeUntilWinner;
         }
 
         private string GetDelayText()
@@ -165,6 +173,12 @@ namespace Challenges
         {
             base.OnNetworkDespawn();
             Destroy(gameObject);
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            CreateRandomSugarServerRpc();
         }
 
         public ulong DecideWinner()
@@ -252,8 +266,8 @@ namespace Challenges
         private void DisplayResultsClientRpc(ulong winnerId, double client1Timestamp, double client2Timestamp,
             RpcParams rpcParams = default)
         {
-            var client1Reaction = client1Timestamp - _challengeStartTime - ChallengeStartDelayInSeconds;
-            var client2Reaction = client2Timestamp - _challengeStartTime - ChallengeStartDelayInSeconds;
+            var client1Reaction = GetClientReactionTime(client1Timestamp);
+            var client2Reaction = GetClientReactionTime(client2Timestamp);
 
             var client1ReactionTimeText = client1Reaction > ChallengeTimeoutLimitInSeconds
                 ? "No response"
@@ -272,6 +286,11 @@ namespace Challenges
                   $" Player {winnerId} wins the challenge!";
         }
 
+        private double GetClientReactionTime(double clientTimestamp)
+        {
+            return clientTimestamp - _challengeStartTime - ChallengeStartDelayInSeconds - _randomTimeSugar;
+        }
+
         // Coroutine to make screen flash red
         private IEnumerator FlashScreenRed()
         {
@@ -286,8 +305,16 @@ namespace Challenges
         {
             var originalColor = _challengeFlashImage.color;
             _challengeFlashImage.color = ScreenFlashGreen;
-            yield return new WaitUntil(() => ChallengeDuration() >= ChallengeStartDelayInSeconds + ChallengeTimeoutLimitInSeconds);
+            yield return new WaitUntil(() =>
+                ChallengeDuration() >= ChallengeStartDelayInSeconds + ChallengeTimeoutLimitInSeconds);
             _challengeFlashImage.color = originalColor;
+        }
+
+        // Create random sugar value as a server rpc
+        [Rpc(SendTo.Server)]
+        private void CreateRandomSugarServerRpc(RpcParams rpcParams = default)
+        {
+            _randomTimeSugar = Random.Range(-RandomTimeSugarWindow, RandomTimeSugarWindow);
         }
     }
 }
