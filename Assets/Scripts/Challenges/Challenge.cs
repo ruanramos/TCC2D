@@ -93,7 +93,7 @@ namespace Challenges
                     // Send player positive feedback
                     if (!_clientFinishTimestamps.ContainsKey(NetworkManager.Singleton.LocalClientId))
                     {
-                        StartCoroutine(TurnScreenGreen());
+                        StartCoroutine(TurnScreenGreenAfterPress());
                     }
 
                     SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
@@ -258,6 +258,15 @@ namespace Challenges
         private void DisplayResultsClientRpc(ulong winnerId, double client1Timestamp, double client2Timestamp,
             RpcParams rpcParams = default)
         {
+            if (NetworkManager.Singleton.LocalClientId == winnerId)
+            {
+                TurnScreenGreenAfterWin();
+            }
+            else
+            {
+                TurnScreenRedAfterLose();
+            }
+            
             var client1Reaction = GetClientReactionTime(client1Timestamp);
             var client2Reaction = GetClientReactionTime(client2Timestamp);
 
@@ -293,13 +302,23 @@ namespace Challenges
         }
 
         // Coroutine to make screen flash green
-        private IEnumerator TurnScreenGreen()
+        private IEnumerator TurnScreenGreenAfterPress()
         {
             var originalColor = _challengeFlashImage.color;
             _challengeFlashImage.color = ScreenFlashGreen;
             yield return new WaitUntil(() =>
                 ChallengeDuration() >= ChallengeStartDelayInSeconds + ChallengeTimeoutLimitInSeconds);
             _challengeFlashImage.color = originalColor;
+        }
+        
+        private void TurnScreenGreenAfterWin()
+        {
+            _challengeFlashImage.color = ScreenFlashGreen;
+        }
+        
+        private void TurnScreenRedAfterLose()
+        {
+            _challengeFlashImage.color = ScreenFlashRed;
         }
 
         // Create random sugar value as a server rpc
