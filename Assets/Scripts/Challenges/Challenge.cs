@@ -65,7 +65,6 @@ namespace Challenges
             {
                 _challengeOuterCanvas.SetActive(true);
                 _challengeInnerCanvas.SetActive(true);
-                _challengeTimeout.SetActive(true);
                 _challengeInfo.SetActive(true);
             }
 
@@ -89,7 +88,7 @@ namespace Challenges
             if (Input.GetKeyDown(KeyCode.Space) && LocalClientInChallenge())
             {
                 if (ChallengeDuration() > _timeUntilStart &&
-                    ChallengeDuration() < _timeUntilWinner && CanSendInput())
+                    ChallengeDuration() < _timeUntilWinner && IsInChallengeTime())
                 {
                     // Send player positive feedback
                     if (!_clientFinishTimestamps.ContainsKey(NetworkManager.Singleton.LocalClientId))
@@ -115,14 +114,16 @@ namespace Challenges
                 _startIndicatorImage.color = Color.red;
             }
 
-            if (CanSendInput() && _startIndicatorImage.color != Color.green)
+            if (IsInChallengeTime() && _startIndicatorImage.color != Color.green)
             {
                 _startIndicatorImage.color = Color.green;
+                _challengeTimeout.SetActive(true);
             }
 
-            if (!CanSendInput() && !IsInDelayTime())
+            if (!IsInChallengeTime() && !IsInDelayTime())
             {
                 _startIndicatorImage.enabled = false;
+                _challengeTimeout.SetActive(false);
             }
 
             // Check if client running this is involved in challenge
@@ -133,7 +134,6 @@ namespace Challenges
             // If client is involved in challenge, show canvas
             _challengeOuterCanvas.SetActive(true);
             _challengeInnerCanvas.SetActive(true);
-            _challengeTimeout.SetActive(true);
             _challengeInfo.SetActive(true);
 
             // Make local client name appear first in challenge header
@@ -157,7 +157,7 @@ namespace Challenges
             return NetworkManager.Singleton.ServerTime.Time - _challengeStartTime;
         }
 
-        private bool CanSendInput()
+        private bool IsInChallengeTime()
         {
             return !IsInDelayTime() && ChallengeDuration() < _timeUntilWinner;
         }
