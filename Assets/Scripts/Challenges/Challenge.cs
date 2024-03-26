@@ -27,6 +27,8 @@ namespace Challenges
 
         public GameObject startIndicator;
         private Image _startIndicatorImage;
+        public GameObject pressCounter;
+        private TextMeshProUGUI _pressCounterText;
 
         private double _challengeStartTime;
 
@@ -35,6 +37,8 @@ namespace Challenges
         private double _randomTimeSugar;
         private double _timeUntilWinner;
         private double _timeUntilStart;
+
+        private int _pressesCounter;
 
         private void Awake()
         {
@@ -47,6 +51,7 @@ namespace Challenges
             _challengeHeader = _challengeOuterCanvas.GetComponentInChildren<TextMeshProUGUI>();
             _challengeFlashImage = _challengeOuterCanvas.GetComponent<Image>();
             _startIndicatorImage = startIndicator.GetComponent<Image>();
+            _pressCounterText = pressCounter.GetComponent<TextMeshProUGUI>();
 
             _challengeOuterCanvas.SetActive(false);
             _challengeInnerCanvas.SetActive(false);
@@ -85,15 +90,20 @@ namespace Challenges
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Space) && LocalClientInChallenge())
+            if (Input.GetKeyDown(KeyCode.Space) && LocalClientInChallenge()  && _pressesCounter < MaxPressesAllowed)
             {
+                UpdatePressesCounterClientRpc(
+                    RpcTarget.Group(new[] { NetworkManager.Singleton.LocalClientId }, RpcTargetUse.Temp));
+
                 if (ChallengeDuration() > _timeUntilStart &&
-                    ChallengeDuration() < _timeUntilWinner && IsInChallengeTime())
+                    ChallengeDuration() < _timeUntilWinner &&
+                    IsInChallengeTime())
                 {
                     // Send player positive feedback
                     if (!_clientFinishTimestamps.ContainsKey(NetworkManager.Singleton.LocalClientId))
                     {
                         StartCoroutine(TurnScreenGreenAfterPress());
+                        _pressCounterText.enabled = false;
                     }
 
                     SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
@@ -231,7 +241,6 @@ namespace Challenges
             // Send keypress only if it's not stored yet
             if (_clientFinishTimestamps.ContainsKey(clientId))
             {
-                // Send negative feedback to player
                 return;
             }
 
@@ -241,6 +250,16 @@ namespace Challenges
 
             // Store timestamp of key press on server if it's not already stored
             _clientFinishTimestamps.TryAdd(clientId, time);
+        }
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        private void UpdatePressesCounterClientRpc(RpcParams rpcParams = default)
+        {
+            _pressesCounter++;
+            var pressesText = MaxPressesAllowed - _pressesCounter > 0
+                ? $"{MaxPressesAllowed - _pressesCounter}"
+                : "No more. Waiting other player...";
+            _pressCounterText.text = $"Remaining Attempts: {pressesText}";
         }
 
         [Rpc(SendTo.Server)]
@@ -266,7 +285,9 @@ namespace Challenges
             {
                 TurnScreenRedAfterLose();
             }
-            
+
+            _pressCounterText.enabled = false;
+
             var client1Reaction = GetClientReactionTime(client1Timestamp);
             var client2Reaction = GetClientReactionTime(client2Timestamp);
 
@@ -310,12 +331,12 @@ namespace Challenges
                 ChallengeDuration() >= ChallengeStartDelayInSeconds + ChallengeTimeoutLimitInSeconds);
             _challengeFlashImage.color = originalColor;
         }
-        
+
         private void TurnScreenGreenAfterWin()
         {
             _challengeFlashImage.color = ScreenFlashGreen;
         }
-        
+
         private void TurnScreenRedAfterLose()
         {
             _challengeFlashImage.color = ScreenFlashRed;

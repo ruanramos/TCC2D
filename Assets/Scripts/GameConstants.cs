@@ -30,6 +30,7 @@ public static class GameConstants
     public static readonly Color ScreenFlashRed = new(255f, 0f, 0f, 0.4f);
     public const float ColorFlashTime = 0.1f;
     public const float RandomTimeSugarWindow = 1.5f;
+    public const int MaxPressesAllowed = 1;
     
 
     public enum ChallengeType
