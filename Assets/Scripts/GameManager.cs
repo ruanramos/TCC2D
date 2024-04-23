@@ -10,6 +10,7 @@ public class GameManager : NetworkBehaviour
 {
     public static NetworkList<PlayerData> ConnectedPlayers;
     private GameObject _mainCamera;
+    private Camera _mainCameraCamera;
     private GameObject _devInfo;
     private GameObject _scoreList;
     private TextMeshProUGUI _devInfoText;
@@ -27,6 +28,7 @@ public class GameManager : NetworkBehaviour
         _scoreListText = _scoreList.GetComponent<TextMeshProUGUI>();
 
         if (Camera.main != null) _mainCamera = Camera.main.gameObject;
+        _mainCameraCamera = _mainCamera.GetComponent<Camera>();
 
         _connectedPlayersText = GameObject.Find("ConnectedPlayersText");
         _connectedPlayersText.SetActive(false);
@@ -40,7 +42,7 @@ public class GameManager : NetworkBehaviour
                 new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), 0) *
                 (Time.deltaTime * BaseObserverCameraMovespeed);
 
-            _mainCamera.GetComponent<Camera>().orthographicSize -= Input.GetAxis("Mouse ScrollWheel") * 10;
+            _mainCameraCamera.orthographicSize -= Input.GetAxis("Mouse ScrollWheel") * 10;
         }
 
         if (Input.GetKeyDown(KeyCode.F1))
