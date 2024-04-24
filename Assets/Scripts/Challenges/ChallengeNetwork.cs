@@ -31,15 +31,22 @@ namespace Challenges
             var challengePrefab = Resources.Load<GameObject>("Prefabs/Challenge");
             var instance = Instantiate(challengePrefab, Vector3.zero, Quaternion.identity);
             AddNewChallenge(instance);
+            var challengeComponent = instance.GetComponent<Challenge>();
             if (!instance.GetComponent<NetworkObject>().IsSpawned)
             {
                 instance.GetComponent<NetworkObject>().Spawn();
-                instance.GetComponent<Challenge>().Client1Id.Value = client1;
-                instance.GetComponent<Challenge>().Client2Id.Value = client2;
+                challengeComponent.Client1Id.Value = client1;
+                challengeComponent.Client2Id.Value = client2;
+                challengeComponent.Client1Name.Value = NetworkManager.Singleton
+                    .ConnectedClients[client1]
+                    .PlayerObject.gameObject.GetComponent<PlayerNetwork>().GetPlayerName();
+                challengeComponent.Client2Name.Value = NetworkManager.Singleton
+                    .ConnectedClients[client2]
+                    .PlayerObject.gameObject.GetComponent<PlayerNetwork>().GetPlayerName();
             }
 
             print(
-                $"<color=#00FF00>Spawned challenge network object for players {client1} and {client2} at time {NetworkManager.Singleton.ServerTime.Time}</color>");
+                $"<color=#00FF00>Spawned challenge network object for players {challengeComponent.Client1Name.Value} and {challengeComponent.Client2Name.Value} at time {NetworkManager.Singleton.ServerTime.Time}</color>");
             return instance;
         }
 

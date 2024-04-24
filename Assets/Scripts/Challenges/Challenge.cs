@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,10 @@ namespace Challenges
     {
         public NetworkVariable<ulong> Client1Id { get; set; } = new();
         public NetworkVariable<ulong> Client2Id { get; set; } = new();
+        
+        public NetworkVariable<FixedString32Bytes> Client1Name { get; set; } = new();
+        public NetworkVariable<FixedString32Bytes> Client2Name { get; set; } = new();
+        
 
         private Dictionary<ulong, double> _clientFinishTimestamps = new();
 
@@ -63,8 +68,8 @@ namespace Challenges
         {
             _challengeStartTime = NetworkManager.Singleton.ServerTime.Time;
             _challengeHeader.text = Client1Id.Value == NetworkManager.LocalClient.ClientId
-                ? $"Player {Client1Id.Value} X Player {Client2Id.Value}"
-                : $"Player {Client2Id.Value} X Player {Client1Id.Value}";
+                ? $"{Client1Name.Value} X {Client2Name.Value}"
+                : $"{Client2Name.Value} X {Client1Name.Value}";
 
             if (LocalClientInChallenge())
             {
@@ -139,8 +144,8 @@ namespace Challenges
 
             // Check if client running this is involved in challenge
             if ((Client1Id.Value == 0 && Client2Id.Value == 0) || !LocalClientInChallenge() ||
-                _challengeHeader.text.Equals($"Player {Client1Id.Value} X Player {Client2Id.Value}") ||
-                _challengeHeader.text.Equals($"Player {Client2Id.Value} X Player {Client1Id.Value}")) return;
+                _challengeHeader.text.Equals($"{Client1Name.Value} X {Client2Name.Value}") ||
+                _challengeHeader.text.Equals($"{Client2Name.Value} X {Client1Name.Value}")) return;
 
             // If client is involved in challenge, show canvas
             _challengeOuterCanvas.SetActive(true);
@@ -149,8 +154,8 @@ namespace Challenges
 
             // Make local client name appear first in challenge header
             _challengeHeader.text = Client1Id.Value == NetworkManager.LocalClient.ClientId
-                ? $"Player {Client1Id.Value} X Player {Client2Id.Value}"
-                : $"Player {Client2Id.Value} X Player {Client1Id.Value}";
+                ? $"{Client1Name.Value} X {Client2Name.Value}"
+                : $"{Client2Name.Value} X {Client1Name.Value}";
         }
 
         private string GetTimeoutText()
@@ -192,7 +197,7 @@ namespace Challenges
                 // Check if any player pressed space
                 case 0:
                     print(
-                        $"<color=#FF00AA>Challenge between {Client1Id.Value} and {Client2Id.Value} had no winner</color>");
+                        $"<color=#FF00AA>Challenge between {Client1Name.Value} and {Client2Name.Value} had no winner</color>");
                     return 0;
 
                 // Check if both players pressed space
@@ -216,7 +221,7 @@ namespace Challenges
                 ? Client1Id.Value
                 : Client2Id.Value;
             print(
-                $"<color=#FF00AA>Winner of challenge between {Client1Id.Value} and {Client2Id.Value} is {winner}</color>");
+                $"<color=#FF00AA>Winner of challenge between {Client1Name.Value} and {Client2Name.Value} is {winner}</color>");
             return winner;
         }
 
@@ -228,7 +233,7 @@ namespace Challenges
 
         public override string ToString()
         {
-            var result = $"{Client1Id.Value} x {Client2Id.Value}: ";
+            var result = $"{Client1Name.Value} x {Client2Name.Value}: ";
             return result;
         }
 
@@ -303,8 +308,8 @@ namespace Challenges
                 $"<color=#FF00AA>Setting winner text for challenge between {Client1Id.Value} and {Client2Id.Value}</color>");
             _challengeInfoText.text = winnerId == 0
                 ? "No winner"
-                : $"Player {Client1Id.Value}: {client1ReactionTimeText} \n" +
-                  $" Player {Client2Id.Value}: {client2ReactionTimeText} \n\n" +
+                : $"Player {Client1Name.Value}: {client1ReactionTimeText} \n" +
+                  $" Player {Client2Name.Value}: {client2ReactionTimeText} \n\n" +
                   $" Player {winnerId} wins the challenge!";
         }
 

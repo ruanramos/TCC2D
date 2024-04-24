@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -75,13 +76,14 @@ public class GameManager : NetworkBehaviour
         {
             _connectedPlayersText.SetActive(true);
         }
+
         NetworkManager.Singleton.OnConnectionEvent += (_, type) => { UpdateConnectedPlayersText(type.EventType); };
     }
 
-    private static Dictionary<ulong, int> GetScores()
+    private static Dictionary<FixedString32Bytes, int> GetScores()
     {
         var scores = FindObjectsOfType<PlayerNetwork>()
-            .ToDictionary(playerNetwork => playerNetwork.OwnerClientId, playerNetwork => playerNetwork.GetScore());
+            .ToDictionary(playerNetwork => playerNetwork.GetPlayerName(), playerNetwork => playerNetwork.GetScore());
 
         // Order the scores by value by using a IOrderedEnumerable
         var orderedScores = scores.OrderByDescending(pair => pair.Value)
@@ -101,7 +103,8 @@ public class GameManager : NetworkBehaviour
 
         while (myEnumerator.MoveNext() && count < MaximumPlayersToDisplayScore)
         {
-            highscoreListString += $"Player {myEnumerator.Current.Key} - {myEnumerator.Current.Value}\n";
+            // Get player name from player network
+            highscoreListString += $"{myEnumerator.Current.Key} - {myEnumerator.Current.Value}\n";
             count++;
         }
 
