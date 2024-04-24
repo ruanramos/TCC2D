@@ -15,10 +15,10 @@ namespace Challenges
     {
         public NetworkVariable<ulong> Client1Id { get; set; } = new();
         public NetworkVariable<ulong> Client2Id { get; set; } = new();
-        
+
         public NetworkVariable<FixedString32Bytes> Client1Name { get; set; } = new();
         public NetworkVariable<FixedString32Bytes> Client2Name { get; set; } = new();
-        
+
 
         private Dictionary<ulong, double> _clientFinishTimestamps = new();
 
@@ -80,6 +80,8 @@ namespace Challenges
 
             _timeUntilWinner = ChallengeTimeoutLimitInSeconds + ChallengeStartDelayInSeconds + _randomTimeSugar;
             _timeUntilStart = ChallengeStartDelayInSeconds + _randomTimeSugar;
+
+            _pressCounterText.text = $"Remaining Attempts: {MaxPressesAllowed}";
         }
 
         private bool LocalClientInChallenge()
@@ -95,7 +97,7 @@ namespace Challenges
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Space) && LocalClientInChallenge()  && _pressesCounter < MaxPressesAllowed)
+            if (Input.GetKeyDown(KeyCode.Space) && LocalClientInChallenge() && _pressesCounter < MaxPressesAllowed)
             {
                 UpdatePressesCounterClientRpc(
                     RpcTarget.Group(new[] { NetworkManager.Singleton.LocalClientId }, RpcTargetUse.Temp));
