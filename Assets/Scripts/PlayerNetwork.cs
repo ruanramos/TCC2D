@@ -50,6 +50,7 @@ public class PlayerNetwork : NetworkBehaviour
         _playerName.OnValueChanged += TreatPlayerNameChanged;
 
         _playerLabelText = player.GetComponentInChildren<TextMeshPro>();
+
         UpdatePlayerLabel();
         _playerLabelText.color = Color.blue;
         GameManager.UpdateHighscoreList();
@@ -131,6 +132,7 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void TreatPlayerNameChanged(FixedString32Bytes previousName, FixedString32Bytes currentName)
     {
+        UpdatePlayerLabel();
         if (IsServer)
         {
             print(
@@ -255,7 +257,17 @@ public class PlayerNetwork : NetworkBehaviour
     private void UpdatePlayerLabel()
     {
         print($"Updating player {OwnerClientId} label");
-        _playerLabelText.text = $"Player: {OwnerClientId} \nLives: {_lives.Value}";
+        if (HasEmptyNickname() && IsOwner)
+        {
+            SetPlayerNameServerRpc($"Player {OwnerClientId}");
+        }
+
+        _playerLabelText.text = $"{_playerName.Value} \nLives: {_lives.Value}";
+    }
+
+    private bool HasEmptyNickname()
+    {
+        return _playerName.Value.Length == 0 || _playerName.Value == "";
     }
 
     public void AddLives(int n)
@@ -310,7 +322,8 @@ public class PlayerNetwork : NetworkBehaviour
         return _score.Value;
     }
 
-    public void SetPlayerName(string playerName)
+    [ServerRpc]
+    public void SetPlayerNameServerRpc(string playerName)
     {
         _playerName.Value = playerName;
     }
