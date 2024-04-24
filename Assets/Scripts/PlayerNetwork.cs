@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -25,6 +26,8 @@ public class PlayerNetwork : NetworkBehaviour
     private CircleCollider2D _collider;
     private NetworkRigidbody2D _networkRigidbody;
 
+    private NetworkVariable<FixedString32Bytes> _playerName = new();
+
     private void Awake()
     {
         _scoreText = GameObject.Find("ScoreUI").GetComponentInChildren<TextMeshProUGUI>();
@@ -44,6 +47,7 @@ public class PlayerNetwork : NetworkBehaviour
         _isInChallenge.OnValueChanged += TreatInChallengeChanged;
         _challengeOpponent.OnValueChanged += TreatOpponentChanged;
         _lives.OnValueChanged += TreatLivesChanged;
+        _playerName.OnValueChanged += TreatPlayerNameChanged;
 
         _playerLabelText = player.GetComponentInChildren<TextMeshPro>();
         UpdatePlayerLabel();
@@ -69,6 +73,7 @@ public class PlayerNetwork : NetworkBehaviour
         _isInChallenge.OnValueChanged -= TreatInChallengeChanged;
         _challengeOpponent.OnValueChanged -= TreatOpponentChanged;
         _lives.OnValueChanged -= TreatLivesChanged;
+        _playerName.OnValueChanged -= TreatPlayerNameChanged;
     }
 
     [ServerRpc]
@@ -121,6 +126,15 @@ public class PlayerNetwork : NetworkBehaviour
         {
             print(
                 $"Player {OwnerClientId} challenge opponent changed from {previousOpponent} to {currentOpponent} at time {NetworkManager.Singleton.ServerTime.Time}");
+        }
+    }
+
+    private void TreatPlayerNameChanged(FixedString32Bytes previousName, FixedString32Bytes currentName)
+    {
+        if (IsServer)
+        {
+            print(
+                $"Player {OwnerClientId} changed name from {previousName} to {currentName} at time {NetworkManager.Singleton.ServerTime.Time}");
         }
     }
 
@@ -294,5 +308,15 @@ public class PlayerNetwork : NetworkBehaviour
     public int GetScore()
     {
         return _score.Value;
+    }
+
+    public void SetPlayerName(string playerName)
+    {
+        _playerName.Value = playerName;
+    }
+
+    public FixedString32Bytes GetPlayerName()
+    {
+        return _playerName.Value;
     }
 }
