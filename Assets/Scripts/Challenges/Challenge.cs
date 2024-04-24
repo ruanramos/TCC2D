@@ -13,6 +13,14 @@ namespace Challenges
 {
     public class Challenge : NetworkBehaviour, IEquatable<Challenge>
     {
+        
+        /*
+         * Challenge lifetime is as follows:
+         * 1. Challenge has a delay time before it starts
+         * 2. Challenge has a rand() time sugar value added to it's delay time
+         * 3. Challenge starts and players have time limit to finish it
+         * 4. Challenge shows who won and how long it took for each player to finish it
+         */
         public NetworkVariable<ulong> Client1Id { get; set; } = new();
         public NetworkVariable<ulong> Client2Id { get; set; } = new();
 
