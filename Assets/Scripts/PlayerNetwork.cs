@@ -133,6 +133,7 @@ public class PlayerNetwork : NetworkBehaviour
     private void TreatPlayerNameChanged(FixedString32Bytes previousName, FixedString32Bytes currentName)
     {
         UpdatePlayerLabel();
+        GameManager.UpdateHighscoreList();
         if (IsServer)
         {
             print(
