@@ -21,11 +21,11 @@ namespace Challenges
          * 4. Challenge shows who won and how long it took for each player to finish it
          */
 
-        public NetworkVariable<ulong> Client1Id { get; set; } = new();
-        public NetworkVariable<ulong> Client2Id { get; set; } = new();
+        public NetworkVariable<ulong> Client1Id { get; } = new();
+        public NetworkVariable<ulong> Client2Id { get; } = new();
 
-        public NetworkVariable<FixedString32Bytes> Client1Name { get; set; } = new();
-        public NetworkVariable<FixedString32Bytes> Client2Name { get; set; } = new();
+        public NetworkVariable<FixedString32Bytes> Client1Name { get; } = new();
+        public NetworkVariable<FixedString32Bytes> Client2Name { get; } = new();
 
         private ChallengeType _challengeType;
 
