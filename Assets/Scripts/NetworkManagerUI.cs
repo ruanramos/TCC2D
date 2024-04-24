@@ -10,29 +10,41 @@ public class NetworkManagerUi : MonoBehaviour
     [SerializeField] private Button hostButton;
     [SerializeField] private Button disconnectButton;
 
+    private GameObject _playerNicknameObject;
+
     private void Awake()
     {
+        _playerNicknameObject = GameObject.Find("NicknameInput");
+
         serverButton.onClick.AddListener(() =>
         {
             NetworkManager.Singleton.StartServer();
             serverButton.image.color = Color.green;
+            Destroy(_playerNicknameObject);
             ActivateDisconnectButton();
         });
-        clientButton.onClick.AddListener(() =>
-        {
-            NetworkManager.Singleton.StartClient();
-            clientButton.image.color = Color.green;
-            ActivateDisconnectButton();
-        });
+
         hostButton.onClick.AddListener(() =>
         {
             NetworkManager.Singleton.StartHost();
             hostButton.image.color = Color.green;
+            var playerNickname = _playerNicknameObject.GetComponent<TMP_InputField>().text;
+            //UpdatePlayerNameClientRpc(playerNickname);
+            Destroy(_playerNicknameObject);
+            ActivateDisconnectButton();
+        });
+
+        clientButton.onClick.AddListener(() =>
+        {
+            NetworkManager.Singleton.StartClient();
+            clientButton.image.color = Color.green;
+            var playerNickname = _playerNicknameObject.GetComponent<TMP_InputField>().text;
+            //UpdatePlayerNameClientRpc(playerNickname);
+            Destroy(_playerNicknameObject);
             ActivateDisconnectButton();
         });
 
         disconnectButton.onClick.AddListener(DisconnectUiBehavior);
-
 
         GameObject.Find("PlayerScore").GetComponent<TextMeshProUGUI>().text = "";
     }
