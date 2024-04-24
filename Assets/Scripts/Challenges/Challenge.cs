@@ -27,7 +27,7 @@ namespace Challenges
         public NetworkVariable<FixedString32Bytes> Client1Name { get; } = new();
         public NetworkVariable<FixedString32Bytes> Client2Name { get; } = new();
 
-        private ChallengeType _challengeType;
+        public NetworkVariable<ChallengeType> Type { get; set; } = new();
 
 
         private Dictionary<ulong, double> _clientFinishTimestamps = new();
@@ -107,31 +107,46 @@ namespace Challenges
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Space) && LocalClientInChallenge() && _pressesCounter < MaxPressesAllowed)
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                UpdatePressesCounterClientRpc(
-                    RpcTarget.Group(new[] { NetworkManager.Singleton.LocalClientId }, RpcTargetUse.Temp));
-
-                if (ChallengeDuration() > _timeUntilStart &&
-                    ChallengeDuration() < _timeUntilWinner &&
-                    IsInChallengeTime())
+                print(Type.Value);
+            }
+            
+            if (IsButtonPressChallenge())
+            {
+                if (Input.GetKeyDown(KeyCode.Space) &&
+                    LocalClientInChallenge() &&
+                    _pressesCounter < MaxPressesAllowed)
                 {
-                    // Send player positive feedback
-                    if (!_clientFinishTimestamps.ContainsKey(NetworkManager.Singleton.LocalClientId))
+                    UpdatePressesCounterClientRpc(
+                        RpcTarget.Group(new[] { NetworkManager.Singleton.LocalClientId }, RpcTargetUse.Temp));
+
+                    if (ChallengeDuration() > _timeUntilStart &&
+                        ChallengeDuration() < _timeUntilWinner &&
+                        IsInChallengeTime())
                     {
-                        StartCoroutine(TurnScreenGreenAfterPress());
-                        _pressCounterText.enabled = false;
+                        // Send player positive feedback
+                        if (!_clientFinishTimestamps.ContainsKey(NetworkManager.Singleton.LocalClientId))
+                        {
+                            StartCoroutine(TurnScreenGreenAfterPress());
+                            _pressCounterText.enabled = false;
+                        }
+
+                        SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
+                            Input.inputString);
                     }
 
-                    SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
-                        Input.inputString);
+                    if (ChallengeDuration() < ChallengeStartDelayInSeconds)
+                    {
+                        // Send player negative feedback
+                        StartCoroutine(FlashScreenRed());
+                    }
                 }
+            }
 
-                if (ChallengeDuration() < ChallengeStartDelayInSeconds)
-                {
-                    // Send player negative feedback
-                    StartCoroutine(FlashScreenRed());
-                }
+            if (IsTypingChallenge())
+            {
+                
             }
 
             _challengeTimeoutText.text = GetTimeoutText();
@@ -170,6 +185,16 @@ namespace Challenges
                 : $"{Client2Name.Value} X {Client1Name.Value}";
         }
 
+        private bool IsButtonPressChallenge()
+        {
+            return Type.Value == ChallengeType.KeyboardButtonPress;
+        }
+
+        private bool IsTypingChallenge()
+        {
+            return Type.Value == ChallengeType.TypingChallenge;
+        }
+
         private string GetTimeoutText()
         {
             var timeoutCounter = ChallengeTimeoutLimitInSeconds - ChallengeDuration() + _timeUntilStart;
@@ -206,13 +231,13 @@ namespace Challenges
         {
             switch (_clientFinishTimestamps.Count)
             {
-                // Check if any player pressed space
+                // Check if any player completed the challenge
                 case 0:
                     print(
                         $"<color=#FF00AA>Challenge between {Client1Name.Value} and {Client2Name.Value} had no winner</color>");
                     return 0;
 
-                // Check if both players pressed space
+                // Check if both players completed the challenge
                 case < 2:
                 {
                     // Print what player didn't finish the challenge

@@ -34,14 +34,17 @@ namespace Challenges
             var challengeComponent = instance.GetComponent<Challenge>();
             if (!instance.GetComponent<NetworkObject>().IsSpawned)
             {
+                // Need to set the type of challenge here
+                challengeComponent.Type.Value = ChallengeType.TypingChallenge;
+                
                 instance.GetComponent<NetworkObject>().Spawn();
                 challengeComponent.Client1Id.Value = client1;
                 challengeComponent.Client2Id.Value = client2;
-                challengeComponent.Client1Name.Value = NetworkManager.Singleton
-                    .ConnectedClients[client1]
+                var connectedClients = NetworkManager.Singleton
+                    .ConnectedClients;
+                challengeComponent.Client1Name.Value = connectedClients[client1]
                     .PlayerObject.gameObject.GetComponent<PlayerNetwork>().GetPlayerName();
-                challengeComponent.Client2Name.Value = NetworkManager.Singleton
-                    .ConnectedClients[client2]
+                challengeComponent.Client2Name.Value = connectedClients[client2]
                     .PlayerObject.gameObject.GetComponent<PlayerNetwork>().GetPlayerName();
             }
 

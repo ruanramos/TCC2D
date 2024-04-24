@@ -37,6 +37,7 @@ public static class GameConstants
     {
         KeyboardButtonPress,
         TypingChallenge,
+        Random
     }
 
     // Layers
