@@ -265,9 +265,7 @@ namespace Challenges
 
                 if (Query.Value.IsEmpty && Answer.Count == 0 && IsServer)
                 {
-                    print("++++++++++++++");
                     CreateRandomQuestionServerRpc();
-                    print("++++++++++++++");
                 }
             }
 
@@ -442,7 +440,6 @@ namespace Challenges
         [Rpc(SendTo.Server)]
         private void CreateRandomQuestionServerRpc(RpcParams rpcParams = default)
         {
-            print("----------------------");
             var question = GetRandomQuestion();
             Query.Value = question.query;
             print(Query.Value);
@@ -450,8 +447,6 @@ namespace Challenges
             {
                 Answer.Add(answer);
             }
-
-            print("----------------------");
         }
     }
 }
