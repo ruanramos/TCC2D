@@ -1,6 +1,8 @@
-﻿namespace Challenges.Questions
+﻿using System;
+
+namespace Challenges.Questions
 {
-    [System.Serializable]
+    [Serializable]
     public class Questions
     {
         public Question[] questions;
