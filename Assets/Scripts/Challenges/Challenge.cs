@@ -105,7 +105,11 @@ namespace Challenges
             _timeUntilWinner = ChallengeTimeoutLimitInSeconds + ChallengeStartDelayInSeconds + _randomTimeSugar;
             _timeUntilStart = ChallengeStartDelayInSeconds + _randomTimeSugar;
 
-            _pressCounterText.text = $"Remaining Attempts: {MaxPressesAllowed}";
+            if (IsButtonPressChallenge())
+            {
+                _pressCounterText.text = $"Remaining Attempts: {MaxPressesAllowed}";
+            }
+            _answerInput.SetActive(false);
         }
 
         private bool LocalClientInChallenge()
@@ -195,12 +199,16 @@ namespace Challenges
             {
                 _startIndicatorImage.color = Color.green;
                 _challengeTimeout.SetActive(true);
+                _answerInput.SetActive(true);
+                _answerInputText.Select();
+                _answerInputText.ActivateInputField();
             }
 
             if (!IsInChallengeTime() && !IsInDelayTime() &&
                 (_startIndicatorImage.enabled || _challengeTimeout.activeSelf))
             {
                 _startIndicatorImage.enabled = false;
+                _answerInput.SetActive(false);
                 _challengeTimeout.SetActive(false);
             }
 
