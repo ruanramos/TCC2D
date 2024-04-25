@@ -181,8 +181,11 @@ namespace Challenges
                             // Check if the answer is correct
                             var playerAnswer = _answerInputText.text;
                             var correctAnswer = Answer.Contains(playerAnswer);
-                            print(Query.Value);
-                            print($"{playerAnswer} - {correctAnswer}");
+                            if (correctAnswer)
+                            {
+                                SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
+                                    Input.inputString);
+                            }
                         }
                     }
                 }
@@ -199,9 +202,12 @@ namespace Challenges
             {
                 _startIndicatorImage.color = Color.green;
                 _challengeTimeout.SetActive(true);
-                _answerInput.SetActive(true);
-                _answerInputText.Select();
-                _answerInputText.ActivateInputField();
+                if (IsQuestionChallenge())
+                {
+                    _answerInput.SetActive(true);
+                    _answerInputText.Select();
+                    _answerInputText.ActivateInputField();
+                }
             }
 
             if (!IsInChallengeTime() && !IsInDelayTime() &&
