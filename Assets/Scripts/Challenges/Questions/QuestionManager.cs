@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,15 +11,6 @@ namespace Challenges.Questions
 
         public override void OnNetworkSpawn()
         {
-            if (IsServer)
-            {
-                LoadQuestions();
-            }
-        }
-
-        private void Awake()
-        {
-            print("AAAAAAAAAAAAAAAAAAAAA");
             if (IsServer)
             {
                 LoadQuestions();
@@ -41,7 +33,10 @@ namespace Challenges.Questions
             foreach (var question in _questions.questions)
             {
                 print(question.query);
-                print(question.answer);
+                foreach (var answer in question.answers)
+                {
+                    print(answer);
+                }
             }
 
             print("++++++++++++++++");
@@ -70,7 +65,7 @@ namespace Challenges.Questions
         public static bool CheckAnswer(Question question, string answer)
         {
             // Check if question.answers contains answer
-            return question.answer.Contains(answer);
+            return ((IList)question.answers).Contains(answer);
         }
     }
 }

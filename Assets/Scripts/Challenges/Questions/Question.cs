@@ -11,6 +11,6 @@ namespace Challenges.Questions
          * A question have a question string and a list of right answers
          */
         public string query;
-        public string answer;
+        public string[] answers;
     }
 }

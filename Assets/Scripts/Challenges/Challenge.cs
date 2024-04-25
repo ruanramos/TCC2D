@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using static Challenges.Questions.QuestionManager;
 using static GameConstants;
 using Random = UnityEngine.Random;
 
@@ -44,6 +45,8 @@ namespace Challenges
         private Image _startIndicatorImage;
         public GameObject pressCounter;
         private TextMeshProUGUI _pressCounterText;
+        private GameObject _challengeInnerCanvasHeader;
+        private TextMeshProUGUI _challengeInnerCanvasHeaderText;
 
         private double _challengeStartTime;
 
@@ -54,6 +57,12 @@ namespace Challenges
         private double _timeUntilStart;
 
         private int _pressesCounter;
+
+        private NetworkVariable<FixedString128Bytes> Question { get; set; } = new();
+        private NetworkList<FixedString128Bytes> Answer { get; set; } = new();
+        private GameObject _answerInput;
+        private TMP_InputField _answerInputText;
+
 
         private void Awake()
         {
@@ -67,6 +76,11 @@ namespace Challenges
             _challengeFlashImage = _challengeOuterCanvas.GetComponent<Image>();
             _startIndicatorImage = startIndicator.GetComponent<Image>();
             _pressCounterText = pressCounter.GetComponent<TextMeshProUGUI>();
+            _challengeInnerCanvasHeader = _challengeInnerCanvas.transform.GetChild(0).gameObject;
+            _challengeInnerCanvasHeaderText = _challengeInnerCanvasHeader.GetComponent<TextMeshProUGUI>();
+            _answerInput = _challengeInnerCanvas.transform.GetChild(3).gameObject;
+            _answerInputText = _answerInput.GetComponent<TMP_InputField>();
+
 
             _challengeOuterCanvas.SetActive(false);
             _challengeInnerCanvas.SetActive(false);
@@ -107,13 +121,9 @@ namespace Challenges
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                print(Type.Value);
-            }
-            
             if (IsButtonPressChallenge())
             {
+                _challengeInnerCanvasHeaderText.text = InnerCanvasTitleKeyboardPressChallenge;
                 if (Input.GetKeyDown(KeyCode.Space) &&
                     LocalClientInChallenge() &&
                     _pressesCounter < MaxPressesAllowed)
@@ -144,9 +154,27 @@ namespace Challenges
                 }
             }
 
-            if (IsTypingChallenge())
+            if (IsQuestionChallenge())
             {
-                
+                _challengeInnerCanvasHeaderText.text = InnerCanvasTitleQuestionChallenge;
+                if (LocalClientInChallenge())
+                {
+                    // Send the answer to clients with a client rpc
+
+                    if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
+                    {
+                        if (ChallengeDuration() > _timeUntilStart &&
+                            ChallengeDuration() < _timeUntilWinner &&
+                            IsInChallengeTime())
+                        {
+                            // Check if the answer is correct
+                            var playerAnswer = _answerInputText.text;
+                            var correctAnswer = Answer.Contains(playerAnswer);
+                            print(Question.Value);
+                            print($"{playerAnswer} - {correctAnswer}");
+                        }
+                    }
+                }
             }
 
             _challengeTimeoutText.text = GetTimeoutText();
@@ -190,9 +218,9 @@ namespace Challenges
             return Type.Value == ChallengeType.KeyboardButtonPress;
         }
 
-        private bool IsTypingChallenge()
+        private bool IsQuestionChallenge()
         {
-            return Type.Value == ChallengeType.TypingChallenge;
+            return Type.Value == ChallengeType.QuestionChallenge;
         }
 
         private string GetTimeoutText()
@@ -224,6 +252,16 @@ namespace Challenges
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            if (IsQuestionChallenge())
+            {
+                _answerInput.SetActive(true);
+
+                if (Question.Value.IsEmpty && Answer.Count == 0 && IsServer)
+                {
+                    CreateRandomQuestionServerRpc();
+                }
+            }
+
             CreateRandomSugarServerRpc();
         }
 
@@ -389,6 +427,18 @@ namespace Challenges
         private void CreateRandomSugarServerRpc(RpcParams rpcParams = default)
         {
             _randomTimeSugar = Random.Range(-RandomTimeSugarWindow, RandomTimeSugarWindow);
+        }
+
+        // Create random question as a server rpc
+        [Rpc(SendTo.Server)]
+        private void CreateRandomQuestionServerRpc(RpcParams rpcParams = default)
+        {
+            print("----------------------");
+            Question.Value = GetRandomQuestion().query;
+            print(Question.Value);
+            //Answer.Add(GetRandomQuestion().answers);
+
+            print("----------------------");
         }
     }
 }

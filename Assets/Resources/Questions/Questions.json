@@ -2,7 +2,16 @@
   "questions": [
     {
       "query": "Qual a capital do Brasil?",
-      "answer": "Brasília"
+      "answers": [
+        "Brasília"
+      ]
+    },
+    {
+      "query": "Qual o nome do maior desgraçado do Brasil?",
+        "answers": [
+            "Jair Bolsonaro",
+            "Bolsonaro"
+        ]
     }
   ]
 }

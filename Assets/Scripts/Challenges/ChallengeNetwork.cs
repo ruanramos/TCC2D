@@ -35,7 +35,7 @@ namespace Challenges
             if (!instance.GetComponent<NetworkObject>().IsSpawned)
             {
                 // Need to set the type of challenge here
-                challengeComponent.Type.Value = ChallengeType.TypingChallenge;
+                challengeComponent.Type.Value = ChallengeType.QuestionChallenge;
                 
                 instance.GetComponent<NetworkObject>().Spawn();
                 challengeComponent.Client1Id.Value = client1;

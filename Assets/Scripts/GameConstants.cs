@@ -24,19 +24,22 @@ public static class GameConstants
     public const float PostChallengeSpeedMultiplier = 2f;
     public const float PlayerAlphaWhileInChallenge = 0.4f;
     public const float ChallengeWinnerTime = 3f;
-    public const int ChallengeTimeoutLimitInSeconds = 3;
+    public const int ChallengeTimeoutLimitInSeconds = 8;
 
     public static readonly Color ScreenFlashGreen = new(0f, 255f, 0f, 0.4f);
     public static readonly Color ScreenFlashRed = new(255f, 0f, 0f, 0.4f);
     public const float ColorFlashTime = 0.1f;
     public const float RandomTimeSugarWindow = 1.5f;
     public const int MaxPressesAllowed = 1;
+
+    public const string InnerCanvasTitleKeyboardPressChallenge = "Press the space bar faster than your opponent!"; 
+    public const string InnerCanvasTitleQuestionChallenge = "Answer the question faster than your opponent!"; 
     
 
     public enum ChallengeType
     {
         KeyboardButtonPress,
-        TypingChallenge,
+        QuestionChallenge,
         Random
     }
 
