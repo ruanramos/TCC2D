@@ -58,7 +58,7 @@ namespace Challenges
 
         private int _pressesCounter;
 
-        private NetworkVariable<FixedString128Bytes> Question { get; set; } = new();
+        private NetworkVariable<FixedString128Bytes> Query { get; set; } = new();
         private NetworkList<FixedString128Bytes> Answer { get; set; } = new();
         private GameObject _answerInput;
         private TMP_InputField _answerInputText;
@@ -159,8 +159,15 @@ namespace Challenges
                 _challengeInnerCanvasHeaderText.text = InnerCanvasTitleQuestionChallenge;
                 if (LocalClientInChallenge())
                 {
-                    // Send the answer to clients with a client rpc
+                    if (ChallengeDuration() >= ChallengeStartDelayInSeconds &&
+                        ChallengeDuration() < _timeUntilWinner &&
+                        IsInChallengeTime() &&
+                        _challengeInnerCanvasHeaderText.text.Equals(InnerCanvasTitleQuestionChallenge))
+                    {
+                        _challengeInnerCanvasHeaderText.text = Query.Value.ToString();
+                    }
 
+                    // Send the answer to clients with a client rpc
                     if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
                     {
                         if (ChallengeDuration() > _timeUntilStart &&
@@ -170,7 +177,7 @@ namespace Challenges
                             // Check if the answer is correct
                             var playerAnswer = _answerInputText.text;
                             var correctAnswer = Answer.Contains(playerAnswer);
-                            print(Question.Value);
+                            print(Query.Value);
                             print($"{playerAnswer} - {correctAnswer}");
                         }
                     }
@@ -256,9 +263,11 @@ namespace Challenges
             {
                 _answerInput.SetActive(true);
 
-                if (Question.Value.IsEmpty && Answer.Count == 0 && IsServer)
+                if (Query.Value.IsEmpty && Answer.Count == 0 && IsServer)
                 {
+                    print("++++++++++++++");
                     CreateRandomQuestionServerRpc();
+                    print("++++++++++++++");
                 }
             }
 
@@ -434,9 +443,13 @@ namespace Challenges
         private void CreateRandomQuestionServerRpc(RpcParams rpcParams = default)
         {
             print("----------------------");
-            Question.Value = GetRandomQuestion().query;
-            print(Question.Value);
-            //Answer.Add(GetRandomQuestion().answers);
+            var question = GetRandomQuestion();
+            Query.Value = question.query;
+            print(Query.Value);
+            foreach (var answer in question.answers)
+            {
+                Answer.Add(answer);
+            }
 
             print("----------------------");
         }

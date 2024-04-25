@@ -27,19 +27,8 @@ namespace Challenges.Questions
                 return null;
             }
 
-            _questions = JsonUtility.FromJson<Questions>(textAsset.text);
-            print("++++++++++++++++");
-            // print questions
-            foreach (var question in _questions.questions)
-            {
-                print(question.query);
-                foreach (var answer in question.answers)
-                {
-                    print(answer);
-                }
-            }
-
-            print("++++++++++++++++");
+            _questions = JsonUtility.FromJson<Questions>(textAsset.text.ToLower());
+            
             if (_questions.questions == null)
             {
                 Debug.LogError("Failed to parse data!");
@@ -57,7 +46,10 @@ namespace Challenges.Questions
                 return null;
             }
 
+            
             var randomIndex = Random.Range(0, _questions.questions.Length);
+            print($"Random index: {randomIndex}");
+            print("Random question: " + _questions.questions[randomIndex].query);
             return _questions.questions[randomIndex];
         }
 
@@ -65,7 +57,7 @@ namespace Challenges.Questions
         public static bool CheckAnswer(Question question, string answer)
         {
             // Check if question.answers contains answer
-            return ((IList)question.answers).Contains(answer);
+            return ((IList)question.answers).Contains(answer.ToLower());
         }
     }
 }

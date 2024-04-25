@@ -8,10 +8,32 @@
     },
     {
       "query": "Qual o nome do maior desgraçado do Brasil?",
-        "answers": [
-            "Jair Bolsonaro",
-            "Bolsonaro"
-        ]
+      "answers": [
+        "Jair Bolsonaro",
+        "Bolsonaro"
+      ]
+    },
+    {
+      "query": "Qual a cor do cavalo branco de Napoleão?",
+      "answers": [
+        "Branco"
+      ]
+    },
+    {
+      "query": "Qual o nome do jogador de LoL com mais quantidade de títulos mundiais?",
+      "answers": [
+        "Faker"
+      ]
+    },
+    {
+      "query": "Digite um jogador do time de LoL da Loud em 2023",
+      "answers": [
+        "Tinowns",
+        "Robo",
+        "RedBert",
+        "Croc",
+        "Route"
+      ]
     }
   ]
 }
