@@ -28,20 +28,19 @@ public class NetworkManagerUi : MonoBehaviour
         {
             NetworkManager.Singleton.StartHost();
             hostButton.image.color = Color.green;
-            var playerNickname = _playerNicknameObject.GetComponent<TMP_InputField>().text;
-            //UpdatePlayerNameClientRpc(playerNickname);
             Destroy(_playerNicknameObject);
             ActivateDisconnectButton();
         });
 
         clientButton.onClick.AddListener(() =>
         {
-            NetworkManager.Singleton.OnConnectionEvent += (_,data) =>
+            NetworkManager.Singleton.OnConnectionEvent += (_, data) =>
             {
                 if (data.EventType != ConnectionEvent.ClientConnected)
                 {
                     return;
                 }
+
                 var playerNickname = _playerNicknameObject.GetComponent<TMP_InputField>().text;
                 NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>()
                     .SetPlayerNameServerRpc(playerNickname);
@@ -55,10 +54,6 @@ public class NetworkManagerUi : MonoBehaviour
         disconnectButton.onClick.AddListener(DisconnectUiBehavior);
 
         GameObject.Find("PlayerScore").GetComponent<TextMeshProUGUI>().text = "";
-    }
-
-    private void SetClientNickname()
-    {
     }
 
     private void DisconnectUiBehavior()
@@ -99,11 +94,4 @@ public class NetworkManagerUi : MonoBehaviour
             button.interactable = true;
         }
     }
-
-    /*// When client connects, this rpc is called to update player name
-    [Rpc(SendTo.Owner)]
-    private void UpdatePlayerNameClientRpc(string playerName, RpcParams rpcParams = default)
-    {
-        GameManager.UpdatePlayerNameServerRpc(rpcParams.Receive.SenderClientId, playerName);
-    }*/
 }
