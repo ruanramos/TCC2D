@@ -11,10 +11,14 @@ public class NetworkManagerUi : MonoBehaviour
     [SerializeField] private Button disconnectButton;
 
     private GameObject _playerNicknameObject;
+    private TMP_InputField _playerNicknameInputField;
 
     private void Awake()
     {
         _playerNicknameObject = GameObject.Find("NicknameInput");
+        _playerNicknameInputField = _playerNicknameObject.GetComponent<TMP_InputField>();
+        _playerNicknameInputField.Select();
+        _playerNicknameInputField.ActivateInputField();
 
         serverButton.onClick.AddListener(() =>
         {
@@ -54,6 +58,12 @@ public class NetworkManagerUi : MonoBehaviour
         disconnectButton.onClick.AddListener(DisconnectUiBehavior);
 
         GameObject.Find("PlayerScore").GetComponent<TextMeshProUGUI>().text = "";
+    }
+
+    private void Update()
+    {
+        if (!Input.GetKeyDown(KeyCode.Return)) return;
+        clientButton.onClick.Invoke();
     }
 
     private void DisconnectUiBehavior()
