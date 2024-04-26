@@ -195,7 +195,6 @@ namespace Challenges
                                 SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
                                     Input.inputString);
                                 _answerInputText.enabled = false;
-                                
                             }
                             else
                             {
@@ -419,11 +418,12 @@ namespace Challenges
 
             print(
                 $"<color=#FF00AA>Setting winner text for challenge between {Client1Id.Value} and {Client2Id.Value}</color>");
+            var win = winnerId == Client1Id.Value ? Client1Name.Value : Client2Name.Value;
             _challengeInfoText.text = winnerId == 0
                 ? "No winner"
-                : $"Player {Client1Name.Value}: {client1ReactionTimeText} \n" +
-                  $" Player {Client2Name.Value}: {client2ReactionTimeText} \n\n" +
-                  $" Player {winnerId} wins the challenge!";
+                : $"{Client1Name.Value}: {client1ReactionTimeText} \n" +
+                  $"{Client2Name.Value}: {client2ReactionTimeText} \n\n" +
+                  $"{win} wins the challenge!";
         }
 
         private double GetClientReactionTime(double clientTimestamp)
