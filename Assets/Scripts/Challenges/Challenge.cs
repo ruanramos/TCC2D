@@ -188,7 +188,7 @@ namespace Challenges
                         {
                             // Check if the answer is correct
                             var playerAnswer = _answerInputText.text;
-                            var correctAnswer = Answer.Contains(playerAnswer);
+                            var correctAnswer = Answer.Contains(playerAnswer.ToLower());
                             if (correctAnswer)
                             {
                                 TurnScreenGreen();
