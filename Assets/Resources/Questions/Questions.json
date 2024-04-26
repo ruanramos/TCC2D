@@ -13,7 +13,7 @@
       ]
     },
     {
-      "query": "Qual o nome do jogador de LoL com mais quantidade de títulos mundiais?",
+      "query": "Qual o nome do jogador de LoL com maior quantidade de títulos mundiais?",
       "answers": [
         "Faker"
       ]
@@ -77,7 +77,7 @@
     {
       "query": "Qual o terceiro elemento dominado por Aang em Avatar?",
         "answers": [
-            "água"
+            "terra"
         ]
     },
     {
