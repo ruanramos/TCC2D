@@ -66,6 +66,16 @@ namespace Challenges
 
         private void Awake()
         {
+            GetReferences();
+
+            _challengeOuterCanvas.SetActive(false);
+            _challengeInnerCanvas.SetActive(false);
+            _challengeTimeout.SetActive(false);
+            _challengeInfo.SetActive(false);
+        }
+
+        private void GetReferences()
+        {
             _challengeOuterCanvas = transform.GetChild(0).gameObject;
             _challengeInnerCanvas = transform.GetChild(1).gameObject;
             _challengeTimeout = _challengeOuterCanvas.transform.GetChild(2).gameObject;
@@ -80,12 +90,6 @@ namespace Challenges
             _challengeInnerCanvasHeaderText = _challengeInnerCanvasHeader.GetComponent<TextMeshProUGUI>();
             _answerInput = _challengeInnerCanvas.transform.GetChild(3).gameObject;
             _answerInputText = _answerInput.GetComponent<TMP_InputField>();
-
-
-            _challengeOuterCanvas.SetActive(false);
-            _challengeInnerCanvas.SetActive(false);
-            _challengeTimeout.SetActive(false);
-            _challengeInfo.SetActive(false);
         }
 
         private void Start()
@@ -109,6 +113,7 @@ namespace Challenges
             {
                 _pressCounterText.text = $"Remaining Attempts: {MaxPressesAllowed}";
             }
+
             _answerInput.SetActive(false);
         }
 
@@ -154,6 +159,9 @@ namespace Challenges
                     {
                         // Send player negative feedback
                         StartCoroutine(FlashScreenRed());
+                        // Focus on the input field again
+                        _answerInputText.Select();
+                        _answerInputText.ActivateInputField();
                     }
                 }
             }
@@ -183,8 +191,13 @@ namespace Challenges
                             var correctAnswer = Answer.Contains(playerAnswer);
                             if (correctAnswer)
                             {
+                                TurnScreenGreen();
                                 SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
                                     Input.inputString);
+                            }
+                            else
+                            {
+                                StartCoroutine(FlashScreenRed());
                             }
                         }
                     }
@@ -380,11 +393,11 @@ namespace Challenges
         {
             if (NetworkManager.Singleton.LocalClientId == winnerId)
             {
-                TurnScreenGreenAfterWin();
+                TurnScreenGreen();
             }
             else
             {
-                TurnScreenRedAfterLose();
+                TurnScreenRed();
             }
 
             _pressCounterText.enabled = false;
@@ -433,12 +446,12 @@ namespace Challenges
             _challengeFlashImage.color = originalColor;
         }
 
-        private void TurnScreenGreenAfterWin()
+        private void TurnScreenGreen()
         {
             _challengeFlashImage.color = ScreenFlashGreen;
         }
 
-        private void TurnScreenRedAfterLose()
+        private void TurnScreenRed()
         {
             _challengeFlashImage.color = ScreenFlashRed;
         }

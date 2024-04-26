@@ -7,13 +7,6 @@
       ]
     },
     {
-      "query": "Qual o nome do maior desgraçado do Brasil?",
-      "answers": [
-        "Jair Bolsonaro",
-        "Bolsonaro"
-      ]
-    },
-    {
       "query": "Qual a cor do cavalo branco de Napoleão?",
       "answers": [
         "Branco"
@@ -34,6 +27,70 @@
         "Croc",
         "Route"
       ]
+    },
+    {
+      "query": "Quantos mega bytes tem um giga byte?",
+      "answers": [
+        "1024"
+      ]
+    },
+    {
+      "query": "Qual a capacidade máxima de um CD?",
+      "answers": [
+        "700MB",
+        "700 MB"
+      ]
+    },
+    {
+      "query": "Quantos bits tem um byte?",
+      "answers": [
+        "8",
+        "oito",
+        "oito bits",
+        "8 bits"
+      ]
+    },
+    {
+      "query": "Como se escreve 'cachorro' em inglês?",
+        "answers": [
+            "dog"
+        ]
+    },
+    {
+      "query": "Como se escreve 'gato' em inglês?",
+        "answers": [
+            "cat"
+        ]
+    },
+    {
+      "query": "Como se escreve 'cavalo' em inglês?",
+        "answers": [
+            "horse"
+        ]
+    },
+    {
+      "query": "Escreva o valor 847 por extenso",
+        "answers": [
+            "oitocentos e quarenta e sete"
+        ]
+    },
+    {
+      "query": "Qual o terceiro elemento dominado por Aang em Avatar?",
+        "answers": [
+            "água"
+        ]
+    },
+    {
+      "query": "Qual o último elemento dominado por Aang em Avatar?",
+      "answers": [
+        "fogo"
+      ]
+    },
+    {
+      "query": "Quem foi o inventor da lâmpada?",
+        "answers": [
+            "Thomas Edison"
+        ]
     }
   ]
 }
