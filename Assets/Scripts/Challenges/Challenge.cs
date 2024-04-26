@@ -194,10 +194,14 @@ namespace Challenges
                                 TurnScreenGreen();
                                 SendKeyboardTimestampToServerServerRpc(NetworkManager.Singleton.ServerTime.Time,
                                     Input.inputString);
+                                _answerInputText.enabled = false;
+                                
                             }
                             else
                             {
                                 StartCoroutine(FlashScreenRed());
+                                _answerInputText.Select();
+                                _answerInputText.ActivateInputField();
                             }
                         }
                     }
