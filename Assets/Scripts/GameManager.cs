@@ -61,6 +61,8 @@ public class GameManager : NetworkBehaviour
     private void Start()
     {
         _devInfo.SetActive(false);
+        NetworkManager.NetworkConfig.ConnectionApproval = true;
+        NetworkManager.Singleton.ConnectionApprovalCallback = ConnectionApprovalCallback;
     }
 
     public static void Disconnect()
@@ -133,5 +135,18 @@ public class GameManager : NetworkBehaviour
                 $"Connected players: {NetworkManager.Singleton.ConnectedClientsList.Count() - 1}\n",
             _ => _connectedPlayersText.GetComponent<TextMeshProUGUI>().text
         };
+    }
+
+    private static void ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request,
+        NetworkManager.ConnectionApprovalResponse response)
+    {
+        response.Approved = true;
+        response.CreatePlayerObject = true;
+        response.Position = GetPlayerSpawnPosition();
+    }
+
+    private static Vector3 GetPlayerSpawnPosition()
+    {
+        return new Vector3(Random.Range(MinHorizontal, MaxHorizontal), Random.Range(MinVertical, MaxVertical), 0);
     }
 }

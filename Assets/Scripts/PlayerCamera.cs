@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class PlayerCamera : NetworkBehaviour
 {
-    public override void OnNetworkSpawn()
+    private void Start()
     {
-        if (!IsOwner) return;
-        if (Camera.main == null) return;
-        var mainCamera = Camera.main.gameObject;
-        mainCamera.transform.parent = transform;
+        if (!IsLocalPlayer) return;
+        Transform transform1;
+        (transform1 = Camera.main!.transform).SetParent(transform);
+        transform1.localPosition = new Vector3(0, 0, -10);
     }
 }
