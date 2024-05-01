@@ -26,7 +26,7 @@ namespace Challenges
             }
         }
 
-        public static GameObject CreateAndSpawnChallenge(ulong client1, ulong client2)
+        public static GameObject CreateAndSpawnChallenge(ulong client1, ulong client2, ChallengeType type)
         {
             var challengePrefab = Resources.Load<GameObject>("Prefabs/Challenge");
             var instance = Instantiate(challengePrefab, Vector3.zero, Quaternion.identity);
@@ -35,8 +35,14 @@ namespace Challenges
             if (!instance.GetComponent<NetworkObject>().IsSpawned)
             {
                 // Need to set the type of challenge here
-                challengeComponent.Type.Value = ChallengeType.QuestionChallenge;
-                
+                if (type == ChallengeType.Random)
+                {
+                    var random = Random.Range(0, 2);
+                    type = random == 0 ? ChallengeType.QuestionChallenge : ChallengeType.KeyboardButtonPress;
+                }
+
+                challengeComponent.Type.Value = type;
+
                 instance.GetComponent<NetworkObject>().Spawn();
                 challengeComponent.Client1Id.Value = client1;
                 challengeComponent.Client2Id.Value = client2;

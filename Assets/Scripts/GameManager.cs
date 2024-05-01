@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using static GameConstants;
+using Random = UnityEngine.Random;
 
 public class GameManager : NetworkBehaviour
 {
@@ -19,6 +22,8 @@ public class GameManager : NetworkBehaviour
 
     private GameObject _connectedPlayersText;
 
+    private static ToggleGroup _challengeTypeToggleGroup;
+    private static ChallengeType _currentChallengeType;
 
     private void Awake()
     {
@@ -27,6 +32,7 @@ public class GameManager : NetworkBehaviour
         _scoreList = GameObject.Find("ScoreList");
         _devInfoText = _devInfo.GetComponent<TextMeshProUGUI>();
         _scoreListText = _scoreList.GetComponent<TextMeshProUGUI>();
+        _challengeTypeToggleGroup = GameObject.Find("ChallengeModesToggleGroup").GetComponent<ToggleGroup>();
 
         if (Camera.main != null) _mainCamera = Camera.main.gameObject;
         _mainCameraCamera = _mainCamera.GetComponent<Camera>();
@@ -80,6 +86,13 @@ public class GameManager : NetworkBehaviour
         }
 
         NetworkManager.Singleton.OnConnectionEvent += (_, type) => { UpdateConnectedPlayersText(type.EventType); };
+        _currentChallengeType = _challengeTypeToggleGroup.GetFirstActiveToggle().name switch
+        {
+            "RandomToggle" => ChallengeType.Random,
+            "QuestionToggle" => ChallengeType.QuestionChallenge,
+            "KeyboardPressToggle" => ChallengeType.KeyboardButtonPress,
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 
     private static Dictionary<FixedString32Bytes, int> GetScores()
@@ -148,5 +161,15 @@ public class GameManager : NetworkBehaviour
     private static Vector3 GetPlayerSpawnPosition()
     {
         return new Vector3(Random.Range(MinHorizontal, MaxHorizontal), Random.Range(MinVertical, MaxVertical), 0);
+    }
+
+    public static ChallengeType GetCurrentChallengeType()
+    {
+        return _currentChallengeType;
+    }
+
+    public static void DestroyToggleGroup()
+    {
+        Destroy(_challengeTypeToggleGroup.gameObject);
     }
 }

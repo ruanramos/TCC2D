@@ -25,6 +25,7 @@ public class NetworkManagerUi : MonoBehaviour
             NetworkManager.Singleton.StartServer();
             serverButton.image.color = Color.green;
             Destroy(_playerNicknameObject);
+            GameManager.DestroyToggleGroup();
             ActivateDisconnectButton();
         });
 
@@ -33,6 +34,7 @@ public class NetworkManagerUi : MonoBehaviour
             NetworkManager.Singleton.StartHost();
             hostButton.image.color = Color.green;
             Destroy(_playerNicknameObject);
+            GameManager.DestroyToggleGroup();
             ActivateDisconnectButton();
         });
 
@@ -50,6 +52,7 @@ public class NetworkManagerUi : MonoBehaviour
                     .SetPlayerNameServerRpc(playerNickname);
                 clientButton.image.color = Color.green;
                 Destroy(_playerNicknameObject);
+                GameManager.DestroyToggleGroup();
             };
             NetworkManager.Singleton.StartClient();
             ActivateDisconnectButton();

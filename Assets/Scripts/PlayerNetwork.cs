@@ -191,7 +191,8 @@ public class PlayerNetwork : NetworkBehaviour
         if (IsServer && !ChallengeExists(OwnerClientId, _challengeOpponent.Value) && _challengeOpponent.Value != 0)
         {
             // Server will create challenge object and spawn
-            _currentChallenge = CreateAndSpawnChallenge(OwnerClientId, _challengeOpponent.Value);
+            _currentChallenge = CreateAndSpawnChallenge(OwnerClientId, _challengeOpponent.Value,
+                GameManager.GetCurrentChallengeType());
             // Start challenge simulation against opponent gameobject by finding the gameobject given the client id
             var opponentGameobject = NetworkManager.Singleton
                 .ConnectedClients[_challengeOpponent.Value]
