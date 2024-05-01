@@ -60,7 +60,7 @@ namespace Challenges
         private int _pressesCounter;
 
         private NetworkVariable<FixedString128Bytes> Query { get; set; } = new();
-        private NetworkList<FixedString128Bytes> Answer { get; set; } = new();
+        private NetworkList<FixedString128Bytes> Answer { get; set; }
         private GameObject _answerInput;
         private TMP_InputField _answerInputText;
 
@@ -68,7 +68,7 @@ namespace Challenges
         private void Awake()
         {
             GetReferences();
-
+            Answer = new NetworkList<FixedString128Bytes>();
             _challengeOuterCanvas.SetActive(false);
             _challengeInnerCanvas.SetActive(false);
             _challengeTimeout.SetActive(false);
