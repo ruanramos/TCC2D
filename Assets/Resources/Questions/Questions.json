@@ -13,25 +13,11 @@
       ]
     },
     {
-      "query": "Qual o nome do jogador de LoL com maior quantidade de títulos mundiais?",
-      "answers": [
-        "Faker"
-      ]
-    },
-    {
-      "query": "Digite um jogador do time de LoL da Loud em 2024",
-      "answers": [
-        "Tinowns",
-        "Robo",
-        "RedBert",
-        "Croc",
-        "Route"
-      ]
-    },
-    {
       "query": "Quantos mega bytes tem um giga byte?",
       "answers": [
-        "1024"
+        "1024",
+        "1024MB",
+        "1024 MB"
       ]
     },
     {
@@ -91,6 +77,26 @@
         "answers": [
             "Thomas Edison"
         ]
+    },
+    {
+      "query": "Digite a seguinte palavra ao contrário: 'carteiro'",
+      "answers": [
+        "orietrac"
+      ]
+    },
+    {
+      "query": "Qual o nome do primeiro presidente do Brasil?",
+      "answers": [
+        "Deodoro da Fonseca",
+        "Deodoro"
+      ]
+    },
+    {
+      "query": "Qual o nome do segundo presidente do Brasil?",
+      "answers": [
+        "Floriano Peixoto",
+        "Floriano"
+      ]
     }
   ]
 }
