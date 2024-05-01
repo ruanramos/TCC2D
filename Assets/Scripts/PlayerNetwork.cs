@@ -34,8 +34,6 @@ public class PlayerNetwork : NetworkBehaviour
         _visuals = gameObject.AddComponent<PlayerVisuals>();
         _collider = gameObject.GetComponent<CircleCollider2D>();
         _networkRigidbody = gameObject.GetComponent<NetworkRigidbody2D>();
-        
-        _collider.enabled = false;
     }
 
     public override void OnNetworkSpawn()
@@ -67,7 +65,6 @@ public class PlayerNetwork : NetworkBehaviour
                 _scoreText.text = "Score: 0";
                 break;
         }
-        StartCoroutine(PlayerPostChallengeBehavior(PostChallengeSpeedMultiplier));
     }
 
     public override void OnNetworkDespawn()
@@ -88,15 +85,14 @@ public class PlayerNetwork : NetworkBehaviour
             inputValue.Normalize();
         }
 
-        transform.position += new Vector3(inputValue.x, inputValue.y) *
-                              (Time.deltaTime * BaseMovespeed * _speedMultiplier);
+        transform.position += new Vector3(inputValue.x, inputValue.y) * (BaseMovespeed * _speedMultiplier);
     }
 
     private void Update()
     {
         if (!IsOwner) return;
 
-        var movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        var movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")) * Time.deltaTime;
         if (movement.magnitude > 0 && !_isInChallenge.Value)
         {
             SendClientInputServerRpc(movement);
