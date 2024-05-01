@@ -25,6 +25,9 @@ public class GameManager : NetworkBehaviour
     private static ToggleGroup _challengeTypeToggleGroup;
     private static ChallengeType _currentChallengeType;
 
+    private float fps;
+    float updateTimer = 0.25f;
+
     private void Awake()
     {
         ConnectedPlayers = new NetworkList<PlayerData>();
@@ -43,6 +46,7 @@ public class GameManager : NetworkBehaviour
 
     private void Update()
     {
+        UpdateFPSDisplay();
         if (IsServer)
         {
             _mainCamera.transform.position +=
@@ -59,8 +63,7 @@ public class GameManager : NetworkBehaviour
 
         if (_devInfo.activeSelf && (IsServer || IsClient))
         {
-            _devInfoText.text = $"Local time: {NetworkManager.Singleton.NetworkTimeSystem.LocalTime}\n" +
-                                $"Server time: {NetworkManager.Singleton.NetworkTimeSystem.ServerTime}\n";
+            _devInfoText.text = $"Fps: {Mathf.Round(fps)}\n";
         }
     }
 
@@ -171,5 +174,13 @@ public class GameManager : NetworkBehaviour
     public static void DestroyToggleGroup()
     {
         Destroy(_challengeTypeToggleGroup.gameObject);
+    }
+
+    private void UpdateFPSDisplay()
+    {
+        updateTimer -= Time.deltaTime;
+        if (!(updateTimer <= 0f)) return;
+        fps = 1f / Time.unscaledDeltaTime;
+        updateTimer = 0.25f;
     }
 }
