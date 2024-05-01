@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using Unity.Collections;
 using Unity.Netcode;
@@ -419,11 +420,25 @@ namespace Challenges
             print(
                 $"<color=#FF00AA>Setting winner text for challenge between {Client1Id.Value} and {Client2Id.Value}</color>");
             var win = winnerId == Client1Id.Value ? Client1Name.Value : Client2Name.Value;
+
+            var acceptedAnswers = new StringBuilder();
+            if (IsQuestionChallenge())
+            {
+                foreach (var answer in Answer)
+                {
+                    acceptedAnswers.Append(answer).Append(", ");
+                }
+
+                // Remove last comma and space
+                acceptedAnswers.Remove(acceptedAnswers.Length - 2, 2);
+            }
+
             _challengeInfoText.text = winnerId == 0
                 ? "No winner"
                 : $"{Client1Name.Value}: {client1ReactionTimeText} \n" +
                   $"{Client2Name.Value}: {client2ReactionTimeText} \n\n" +
-                  $"{win} wins the challenge!";
+                  $"{win} wins the challenge! \n\n" +
+                  $"Accepted answers: {acceptedAnswers}";
         }
 
         private double GetClientReactionTime(double clientTimestamp)
