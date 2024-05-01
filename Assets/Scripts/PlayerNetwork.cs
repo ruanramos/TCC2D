@@ -201,7 +201,7 @@ public class PlayerNetwork : NetworkBehaviour
             StartCoroutine(StartChallenge(_currentChallenge, gameObject, opponentGameobject));
         }
 
-        StartCoroutine(_visuals.MakePlayerTransparentWhileInChallenge());
+        StartCoroutine(_visuals.MakePlayerTransparent(PostChallengeInvincibilityTimeInSeconds));
     }
 
     private IEnumerator PlayerPostChallengeBehavior(float multiplier)

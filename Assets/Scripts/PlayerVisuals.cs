@@ -36,12 +36,12 @@ public class PlayerVisuals : NetworkBehaviour
         _color.OnValueChanged -= TreatColorChanged;
     }
 
-    public IEnumerator MakePlayerTransparentWhileInChallenge()
+    public IEnumerator MakePlayerTransparent(float time)
     {
         var color = _spriteRenderer.color;
         _spriteRenderer.color = new Color(color.r, color.g, color.b, PlayerAlphaWhileInChallenge);
         yield return new WaitWhile(() => _playerNetwork.GetIsInChallenge());
-        yield return new WaitForSeconds(PostChallengeInvincibilityTimeInSeconds);
+        yield return new WaitForSeconds(time);
         _spriteRenderer.color = color;
     }
 
