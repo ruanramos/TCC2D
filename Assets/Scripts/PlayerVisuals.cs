@@ -20,7 +20,7 @@ public class PlayerVisuals : NetworkBehaviour
     {
         if (!IsServer)
         {
-            gameObject.GetComponentInChildren<SpriteRenderer>().color = currentColor;
+            _spriteRenderer.color = currentColor;
         }
     }
 
@@ -48,10 +48,9 @@ public class PlayerVisuals : NetworkBehaviour
     [ServerRpc]
     private void SetUpColorServerRpc(ServerRpcParams serverRpcParams = default)
     {
-        print($"Entered set up color server rpc at {NetworkManager.ServerTime.Time}");
         if (!IsServer) return;
         _color.Value = Random.ColorHSV();
-        gameObject.GetComponentInChildren<SpriteRenderer>().color = _color.Value;
+        _spriteRenderer.color = _color.Value;
         print($"Applying color {_color.Value} at {NetworkManager.ServerTime.Time}");
     }
 }
