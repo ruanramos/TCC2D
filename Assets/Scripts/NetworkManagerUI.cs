@@ -66,7 +66,10 @@ public class NetworkManagerUi : MonoBehaviour
     private void Update()
     {
         if (!Input.GetKeyDown(KeyCode.Return)) return;
-        clientButton.onClick.Invoke();
+        if (!NetworkManager.Singleton.IsClient || !NetworkManager.Singleton.IsServer)
+        {
+            clientButton.onClick.Invoke();
+        }
     }
 
     private void DisconnectUiBehavior()
