@@ -26,6 +26,7 @@ public class GameManager : NetworkBehaviour
     private static ChallengeType _currentChallengeType;
 
     private float fps;
+    private double rtt;
     float updateTimer = 0.25f;
 
     private void Awake()
@@ -46,7 +47,6 @@ public class GameManager : NetworkBehaviour
 
     private void Update()
     {
-        UpdateFPSDisplay();
         if (IsServer)
         {
             _mainCamera.transform.position +=
@@ -63,7 +63,17 @@ public class GameManager : NetworkBehaviour
 
         if (_devInfo.activeSelf && (IsServer || IsClient))
         {
-            _devInfoText.text = $"Fps: {Mathf.Round(fps)}\n";
+            UpdateFPSDisplay();
+            UpdateRTTDisplay();
+            if (IsServer)
+            {
+                _devInfoText.text = $"Fps: {Mathf.Round(fps)}\n";
+            }
+
+            if (IsClient)
+            {
+                _devInfoText.text = $"Fps: {Mathf.Round(fps)}\nRTT: {rtt}\n";
+            }
         }
     }
 
@@ -181,6 +191,15 @@ public class GameManager : NetworkBehaviour
         updateTimer -= Time.deltaTime;
         if (!(updateTimer <= 0f)) return;
         fps = 1f / Time.unscaledDeltaTime;
+        updateTimer = 0.25f;
+    }
+
+    private void UpdateRTTDisplay()
+    {
+        if (!IsClient) return;
+        updateTimer -= Time.deltaTime;
+        if (!(updateTimer <= 0f)) return;
+        rtt = Math.Round((NetworkManager.Singleton.LocalTime - NetworkManager.Singleton.ServerTime).Time, 3);
         updateTimer = 0.25f;
     }
 }
