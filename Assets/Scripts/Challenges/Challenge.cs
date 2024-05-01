@@ -421,24 +421,23 @@ namespace Challenges
                 $"<color=#FF00AA>Setting winner text for challenge between {Client1Id.Value} and {Client2Id.Value}</color>");
             var win = winnerId == Client1Id.Value ? Client1Name.Value : Client2Name.Value;
 
-            var acceptedAnswers = new StringBuilder();
-            if (IsQuestionChallenge())
-            {
-                foreach (var answer in Answer)
-                {
-                    acceptedAnswers.Append(answer).Append(", ");
-                }
-
-                // Remove last comma and space
-                acceptedAnswers.Remove(acceptedAnswers.Length - 2, 2);
-            }
-
             _challengeInfoText.text = winnerId == 0
                 ? "No winner"
                 : $"{Client1Name.Value}: {client1ReactionTimeText} \n" +
                   $"{Client2Name.Value}: {client2ReactionTimeText} \n\n" +
-                  $"{win} wins the challenge! \n\n" +
-                  $"Accepted answers: {acceptedAnswers}";
+                  $"{win} wins the challenge!";
+
+            if (!IsQuestionChallenge()) return;
+
+            var acceptedAnswers = new StringBuilder();
+            foreach (var answer in Answer)
+            {
+                acceptedAnswers.Append(answer).Append(", ");
+            }
+
+            // Remove last comma and space
+            acceptedAnswers.Remove(acceptedAnswers.Length - 2, 2);
+            _challengeInfoText.text += $"\n\nAccepted answers: {acceptedAnswers}";
         }
 
         private double GetClientReactionTime(double clientTimestamp)
