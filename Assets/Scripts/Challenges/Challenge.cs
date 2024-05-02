@@ -418,7 +418,7 @@ namespace Challenges
 
             _challengeInfoText.text = winnerId == 0
                 ? "No winner"
-                : $"{win} wins the challenge and was {differenceInTime} faster!";
+                : $"{win} wins the challenge and was {Math.Round(differenceInTime, 4)} seconds faster!";
 
             if (!IsQuestionChallenge()) return;
 
