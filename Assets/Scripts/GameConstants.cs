@@ -23,7 +23,7 @@ public static class GameConstants
     public const float PostChallengeInvincibilityTimeInSeconds = 3f;
     public const float PostChallengeSpeedMultiplier = 2f;
     public const float PlayerAlphaWhileInChallenge = 0.4f;
-    public const float ChallengeWinnerTime = 3f;
+    public const float ChallengeWinnerTime = 5f;
     public const int ChallengeTimeoutLimitInSeconds = 8;
 
     public static readonly Color ScreenFlashGreen = new(0f, 255f, 0f, 0.4f);
