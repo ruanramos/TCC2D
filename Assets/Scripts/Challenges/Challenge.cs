@@ -251,12 +251,12 @@ namespace Challenges
                 : $"{Client2Name.Value} X {Client1Name.Value}";
         }
 
-        private bool IsButtonPressChallenge()
+        public bool IsButtonPressChallenge()
         {
             return Type.Value == ChallengeType.KeyboardButtonPress;
         }
 
-        private bool IsQuestionChallenge()
+        public bool IsQuestionChallenge()
         {
             return Type.Value == ChallengeType.QuestionChallenge;
         }
@@ -409,23 +409,16 @@ namespace Challenges
             var client1Reaction = GetClientReactionTime(client1Timestamp);
             var client2Reaction = GetClientReactionTime(client2Timestamp);
 
-            var client1ReactionTimeText = client1Reaction > ChallengeTimeoutLimitInSeconds
-                ? "No response"
-                : $"{client1Reaction}";
-
-            var client2ReactionTimeText = client2Reaction > ChallengeTimeoutLimitInSeconds
-                ? "No response"
-                : $"{client2Reaction}";
+            var differenceInTime = Math.Abs(client2Reaction - client1Reaction);
 
             print(
                 $"<color=#FF00AA>Setting winner text for challenge between {Client1Id.Value} and {Client2Id.Value}</color>");
             var win = winnerId == Client1Id.Value ? Client1Name.Value : Client2Name.Value;
 
+
             _challengeInfoText.text = winnerId == 0
                 ? "No winner"
-                : $"{Client1Name.Value}: {client1ReactionTimeText} \n" +
-                  $"{Client2Name.Value}: {client2ReactionTimeText} \n\n" +
-                  $"{win} wins the challenge!";
+                : $"{win} wins the challenge and was {differenceInTime} faster!";
 
             if (!IsQuestionChallenge()) return;
 

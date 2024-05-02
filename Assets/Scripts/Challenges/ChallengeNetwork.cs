@@ -72,7 +72,14 @@ namespace Challenges
 
             var challengeComponent = challenge.GetComponent<Challenge>();
 
-            yield return new WaitForSeconds(ChallengeTimeoutLimitInSeconds);
+            if (challengeComponent.IsQuestionChallenge())
+            {
+                yield return new WaitForSeconds(ChallengeTimeoutLimitInSeconds);
+            }
+            else if (challengeComponent.IsButtonPressChallenge())
+            {
+                yield return new WaitForSeconds(ChallengeTimeoutLimitInSeconds);
+            }
 
             var winnerId = challengeComponent.DecideWinner();
             var loserId = winnerId == player2Id
